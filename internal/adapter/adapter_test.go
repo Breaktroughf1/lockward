@@ -354,3 +354,27 @@ func TestSettingsScrubAndAllow(t *testing.T) {
 		t.Error("With")
 	}
 }
+
+// FuzzConfigParsers feeds arbitrary bytes through the JSONC and TOML parsers
+// and every structure walker that consumes their output. Untrusted
+// repositories control these files (scan-repo), so none may panic.
+func FuzzConfigParsers(f *testing.F) {
+	f.Add([]byte(`{"mcpServers":{"a":{"command":"npx","args":["-y","x@1.0.0"],"env":{"K":"v"}}},"hooks":{"E":[{"matcher":"m","hooks":[{"type":"command","command":"x.sh"}]}]}}`))
+	f.Add([]byte("[mcp_servers.x]\ncommand = \"uvx\"\nargs = [\"a==1\"]\n[[hooks.E]]\nmatcher = \"m\"\n"))
+	f.Add([]byte(`{"servers":{"x":{"url":"https://u:p@h/?token=t"}},"permissions":{"allow":["*"]}}`))
+	f.Fuzz(func(_ *testing.T, b []byte) {
+		for _, parse := range []func([]byte) (map[string]any, error){ParseJSONC, ParseTOML} {
+			m, err := parse(b)
+			if err != nil {
+				continue
+			}
+			for _, key := range []string{"mcpServers", "servers", "mcp_servers"} {
+				Servers(Obj(m, key), ServerOptions{Agent: "a", File: "f"})
+			}
+			Hooks(Obj(m, "hooks"), HookOptions{Agent: "a", File: "f"})
+			Hooks(m, HookOptions{Agent: "a", File: "f"})
+			Settings(m, SettingsOptions{Agent: "a", File: "f", Keys: []string{"permissions", "env", "chat.*", "a.b"},
+				AutoApprove: func(m map[string]any) []string { return BroadAllowEntries(Strings(Obj(m, "permissions"), "allow")) }})
+		}
+	})
+}

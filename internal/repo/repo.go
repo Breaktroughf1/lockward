@@ -122,8 +122,16 @@ func describe(fsys fs.FS, e asset.Entry, a *asset.Asset) (Item, error) {
 	if a != nil {
 		it.Approvals = a.AutoApprove
 	}
-	switch e.Surface {
-	case asset.SurfaceHook:
+	switch {
+	case e.Hook == nil && e.Server == nil && e.Settings == nil && (e.Surface == asset.SurfaceHook || e.Surface == asset.SurfaceMCP || e.Surface == asset.SurfaceSettings):
+		// Pinned as raw bytes because it could not be parsed.
+		it.Executes = "config file could not be parsed; review it by hand (the agent may still load it)"
+		if a != nil && a.ContentPath != "" {
+			if err := scan(a.ContentPath); err != nil {
+				return it, err
+			}
+		}
+	case e.Surface == asset.SurfaceHook:
 		h := e.Hook
 		it.CanRun = len(h.Commands()) > 0
 		it.Connects = h.URL != ""
@@ -150,7 +158,7 @@ func describe(fsys fs.FS, e asset.Entry, a *asset.Asset) (Item, error) {
 				return it, err
 			}
 		}
-	case asset.SurfaceMCP:
+	case e.Surface == asset.SurfaceMCP:
 		s := e.Server
 		if s.URL != "" {
 			it.Connects = true
@@ -166,7 +174,7 @@ func describe(fsys fs.FS, e asset.Entry, a *asset.Asset) (Item, error) {
 		if s.Trust {
 			it.Executes += " (trusted: tool calls skip confirmation)"
 		}
-	case asset.SurfaceSkill:
+	case e.Surface == asset.SurfaceSkill:
 		scripts := 0
 		if a != nil && a.ContentPath != "" {
 			for _, f := range e.Files {
@@ -185,13 +193,13 @@ func describe(fsys fs.FS, e asset.Entry, a *asset.Asset) (Item, error) {
 			it.CanRun = true
 			it.Executes = fmt.Sprintf("contains %d script(s) or executable(s) the agent may run", scripts)
 		}
-	case asset.SurfaceRules:
+	case e.Surface == asset.SurfaceRules:
 		if a != nil && a.ContentPath != "" {
 			if err := scan(a.ContentPath); err != nil {
 				return it, err
 			}
 		}
-	case asset.SurfaceSettings:
+	case e.Surface == asset.SurfaceSettings:
 		if len(it.Approvals) > 0 {
 			it.Executes = "auto-approves: " + strings.Join(it.Approvals, "; ")
 		}

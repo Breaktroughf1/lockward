@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"path"
 	"path/filepath"
@@ -275,9 +276,18 @@ func (s *Source) ReadConfig(p string) (b []byte, ok bool, problem string) {
 	if info.Size() > MaxConfigSize {
 		return nil, true, fmt.Sprintf("larger than %d bytes; pinned as raw bytes without parsing", MaxConfigSize)
 	}
-	b, err = fs.ReadFile(s.FS, resolved)
+	f, err := s.FS.Open(resolved)
 	if err != nil {
 		return nil, true, err.Error()
+	}
+	defer f.Close()
+	// Bounded read: the file may have grown since it was stat'ed.
+	b, err = io.ReadAll(io.LimitReader(f, MaxConfigSize+1))
+	if err != nil {
+		return nil, true, err.Error()
+	}
+	if len(b) > MaxConfigSize {
+		return nil, true, fmt.Sprintf("larger than %d bytes; pinned as raw bytes without parsing", MaxConfigSize)
 	}
 	return b, true, ""
 }

@@ -169,6 +169,14 @@ func (ev *evaluator) entry(e *asset.Entry, a *asset.Asset) error {
 			ev.add("LW008", e, file, 0, s)
 		}
 	}
+	if e.Server == nil && e.Hook == nil && e.Settings == nil && e.Surface != asset.SurfaceSkill && e.Surface != asset.SurfaceRules {
+		// A config file pinned as raw bytes because it could not be parsed:
+		// still scan its text for network tools and credential paths.
+		if a != nil && a.ContentPath != "" {
+			return ev.scanFile(e, a.ContentPath, file, true, true, true)
+		}
+		return nil
+	}
 	switch e.Surface {
 	case asset.SurfaceMCP:
 		ev.mcp(e, a, file)
