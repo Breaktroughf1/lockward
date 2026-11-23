@@ -2,7 +2,11 @@
 
 Target: **v0.1.0 public launch mid-January 2027** (avoid the late-December holiday dead zone). Week 1 starts the week of 24 November 2026.
 
-## v0.1.0 — "Lock it" (weeks 1–9)
+## v0.1.0 — "Lock it"
+
+**Status: feature-complete and tagged 2026-11-24**, ahead of the original nine-week plan below. Remaining launch work: publishing the GitHub release, the corpus benchmark (week 7), the README GIF and the launch posts (week 9).
+
+### Original plan (weeks 1–9)
 
 | Week | Dates (approx.) | Milestone | Exit criteria |
 |---|---|---|---|

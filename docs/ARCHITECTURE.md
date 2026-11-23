@@ -3,39 +3,57 @@
 ## 1. Overview
 
 ```
-            +---------------------------- lockward CLI (cmd/lockward) ---------------------------+
-            |  init  lock  verify  diff  approve  status  scan-repo  bom  version                |
-            +-------------------------------------+---------------------------------------------+
-                                                  |
-        +----------------+-----------------+------+-----------+-----------------+--------------+
-        |                |                 |                  |                 |              |
-   internal/discover  internal/hash   internal/lock     internal/policy   internal/report  internal/repo
-   (runs adapters)    (file + tree)   (read/write/      (rules LW001…)    (text, json,     (scan-repo,
-        |                              compare)                             sarif, cdx)      read-only)
+              +------------------------- lockward CLI (cmd/lockward) --------------------------+
+              |  init  lock  verify  diff  approve  status  scan-repo  bom  version             |
+              |  flag parsing, help, exit codes, printing only (ADR-0005)                       |
+              +--------------------------+------------------------------+---------------------+
+                                         |                              |
+                                internal/engine                    internal/repo
+                       (lock, verify, approve, diff per scope)    (scan-repo, read-only)
+                                         |                              |
+        +-------------+---------------+--+-----------+----------------+-+------------+
+        |             |               |              |                |              |
+ internal/discover internal/lock internal/policy internal/report internal/prose internal/snapshot
+ (runs adapters,  (lockfile model, (rules LW001–  (text, json,    (sentence    (local text
+  hashes entries)  codec, compare,  LW008, policy  sarif, cdx)     diff)        snapshots)
+        |          approve)         file)
         v
-   internal/adapter/{claudecode,cursor,codex,geminicli,windsurf,copilot}
-   each: Discover(root, scope) -> []Asset   (pure, read-only, fixture-tested)
+ internal/adapter (Source, parsing toolkit) -> internal/adapter/{claudecode,cursor,codex,
+                                               geminicli,windsurf,copilot,generic}
+ shared: internal/asset (types) · internal/hash (digests, canonical JSON) · internal/redact
+         internal/ignore (.lockwardignore) · internal/tools (tools/list fingerprints)
+         internal/identity (approver from git config) · internal/exitcode
 ```
 
 Data flow for `verify`:
-`discover` → `[]Asset` → `hash` → `[]Entry` → `lock.Compare(live, locked)` → `[]Result` → `policy.Evaluate` → `report.Render` → exit code.
+`discover.Run` → adapters → `[]asset.Asset` → hashed `[]asset.Entry` → tool fingerprints → `lock.Compare(locked, live)` → `policy.Evaluate(live)` → `report.Render` → exit code.
 
 ## 2. Repository layout
 
 ```
-cmd/lockward/            main package, CLI wiring only (stdlib flag — ADR-0005)
-internal/adapter/        one package per agent; no cross-adapter imports
+cmd/lockward/            main package: CLI wiring only (stdlib flag, ADR-0005)
+internal/adapter/        Source (scan root, cached project walk, symlink resolution) and the
+                         parsing toolkit (JSONC, TOML, MCP servers, hooks, settings subsets)
+internal/adapter/<agent> one package per agent; no cross-adapter imports; README with sources
 internal/asset/          Asset and Entry types shared across packages
-internal/discover/       adapter registry, scope roots, ignore handling
+internal/discover/       adapter registry, merging, id assignment, hashing into entries
+internal/engine/         lock / verify / approve / diff orchestration for one scope
+internal/exitcode/       exit codes from PRD §8
 internal/hash/           streaming file digest, tree digest, canonical JSON
-internal/lock/           lockfile model, canonical encode/decode, compare
-internal/policy/         policy schema, built-in rules, evaluation
-internal/report/         renderers: text, json, sarif, cyclonedx
+internal/identity/       approver identity from git config files (never runs git)
+internal/ignore/         .lockwardignore matcher
+internal/lock/           lockfile model, canonical encode/decode, compare, approve
+internal/policy/         policy schema, built-in rules, streaming text scans
+internal/prose/          sentence-level diff for Markdown and text
+internal/redact/         secret masking for arguments, URLs and settings
 internal/repo/           scan-repo
-internal/prose/          sentence-level diff for Markdown/text
-testdata/                fixtures per adapter, golden outputs, malicious corpus
-action/                  GitHub Action (action.yml + checksum-verifying wrapper)
-docs/                    PRD, SPEC, threat model, ADRs
+internal/report/         renderers: text, JSON, SARIF 2.1.0, CycloneDX 1.6
+internal/snapshot/       content-addressed local snapshots for diff
+internal/tools/          MCP tools/list fingerprints (SPEC §5.4)
+testdata/adapters/       fixture trees per agent (project and user scope, malformed)
+testdata/schemas/        vendored SARIF and CycloneDX schemas (tests only)
+action/                  GitHub Action (composite, verifies the release before running)
+docs/                    PRD, SPEC, threat model, usage, policy, ADRs
 ```
 
 `internal/` keeps the API private until the lockfile spec stabilises; a public `pkg/lockfile` may follow in v0.2.
@@ -49,55 +67,51 @@ docs/                    PRD, SPEC, threat model, ADRs
 | No LLM in decision path | Deterministic only | [0003](adr/0003-no-llm-in-decision-path.md) |
 | Offline by default | No network in default paths | [0004](adr/0004-offline-by-default.md) |
 | CLI parsing | Stdlib `flag`, no CLI framework | [0005](adr/0005-cli-stdlib-flag.md) |
+| Dependencies | Two runtime modules (YAML, TOML), one test-only | [0006](adr/0006-dependencies.md) |
 
 ## 4. Adapter contract
 
 ```go
 type Adapter interface {
-    Name() string                         // "claude-code"
-    Discover(ctx context.Context, fsys fs.FS, scope Scope) ([]asset.Asset, error)
+    Name() string // "claude-code"
+    Discover(ctx context.Context, src *adapter.Source) (adapter.Result, error)
+}
+
+type Source struct {
+    FS      fs.FS       // os.Root-backed: refuses symlinks that escape the root
+    Scope   asset.Scope // user or project
+    RootDir string      // absolute root, to map absolute in-root symlinks
+    Ignore  *ignore.Matcher
 }
 ```
 
 Rules:
-- Accept an `fs.FS` (enables in-memory fixture tests; prevents accidental writes).
-- Never execute anything; never follow symlinks outside `fsys`.
-- Missing config → zero assets, not an error. Malformed config → a reported finding, not a crash.
-- Each adapter documents the config paths it reads, with links to upstream docs and the date verified, in `internal/adapter/<name>/README.md`.
-
-### Initial config paths to support (verify against current upstream docs in week 1)
-
-| Agent | Skills | MCP | Hooks | Rules |
-|---|---|---|---|---|
-| Claude Code | `.claude/skills/*/`, `~/.claude/skills/*/`, plugin skills | `.mcp.json`, `~/.claude.json` | `.claude/settings.json`, `.claude/settings.local.json`, `~/.claude/settings.json` | `CLAUDE.md`, `.claude/CLAUDE.md`, `~/.claude/CLAUDE.md`, `.claude/commands/`, `.claude/agents/` |
-| Cursor | — | `.cursor/mcp.json`, `~/.cursor/mcp.json` | `.cursor/hooks.json` | `.cursor/rules/*.mdc`, `.cursorrules` |
-| Codex | `.codex/skills/`, `~/.codex/skills/` | `~/.codex/config.toml` | — | `AGENTS.md` (+ nested) |
-| Gemini CLI | extensions | `.gemini/settings.json`, `~/.gemini/settings.json` | — | `GEMINI.md` |
-| Windsurf | — | `~/.codeium/windsurf/mcp_config.json` | — | `.windsurfrules`, `.windsurf/rules/` |
-| Copilot | — | `.vscode/mcp.json` | — | `.github/copilot-instructions.md`, `.github/instructions/*.md` |
+- Read only through `Source`: `ReadConfig`, `Children`, `Files`, `Stat`/`Real`, and the cached project walk (`Nested`, `NestedDirs`). Never execute anything; never follow symlinks outside the root (`Source.Real` resolves chains lexically, including absolute targets inside the root).
+- Each path is emitted by exactly one adapter (its owner) with `LoadedBy` listing every agent that reads it; discovery merges duplicates defensively.
+- Missing config → zero assets, not an error. Malformed config → pinned as raw bytes plus a reported problem, never a crash.
+- Secret values never leave the adapter: MCP and hook parsing reduce env and header maps to names and redact arguments and URLs; the locations of inline secrets travel on `Asset.InlineSecrets` for policy only and are never serialised.
+- Each adapter documents the config paths it reads, with upstream links and the date verified, in `internal/adapter/<name>/README.md`. The cross-agent summary is [AGENT_PATHS.md](AGENT_PATHS.md).
 
 ## 5. Dependencies policy
 
-Minimal and justified. Expected candidates (each needs a one-line justification in an ADR or `go.mod` comment):
-- CLI: none; stdlib `flag` ([ADR-0005](adr/0005-cli-stdlib-flag.md)).
-- YAML: `gopkg.in/yaml.v3` / `go.yaml.in/yaml/v3`.
-- TOML (Codex): `github.com/pelletier/go-toml/v2`.
-- CycloneDX: `github.com/CycloneDX/cyclonedx-go`.
-- Policy expressions (optional, v0.2): `github.com/google/cel-go`.
+Minimal and justified ([ADR-0006](adr/0006-dependencies.md)):
+- `go.yaml.in/yaml/v3`: policy file.
+- `github.com/pelletier/go-toml/v2`: Codex `config.toml`.
+- `github.com/santhosh-tekuri/jsonschema/v6`: tests only, validates SARIF and CycloneDX output against the official schemas offline.
 
-No dependency may perform network I/O on import or in code paths we call.
+CycloneDX and SARIF are emitted from small local structs instead of SDKs. No dependency may perform network I/O on import or in code paths we call; depguard bans `os/exec`, `plugin`, `net`, `net/http` and `net/rpc` in non-test code.
 
 ## 6. Testing strategy
 
-- Unit tests with table-driven cases; golden files under `testdata/golden/` (update with `go test ./... -update`).
-- Adapter fixtures: realistic config trees under `testdata/adapters/<agent>/`.
-- Security invariants from THREAT_MODEL §6 as named tests (`TestInvariant_NoExec…`).
-- Fuzz: lockfile decoder, each adapter parser, prose differ.
-- Offline test: CI job runs tests inside `unshare -n` (Linux) to prove no network.
-- Benchmark corpus (week 7): Trail of Bits and Snyk malicious skill samples (hashes only committed if licences forbid redistribution).
+- Table-driven unit tests; golden files under each package's `testdata/golden/` (update with `go test ./... -update` and review the diff).
+- Adapter fixtures under `testdata/adapters/<agent>/{project,user}` plus a malformed tree; discovery goldens record every entry and problem.
+- Security invariants from THREAT_MODEL §6 as named tests (`TestInvariant_*`), plus the bypass techniques in [WHAT_IT_CATCHES.md](WHAT_IT_CATCHES.md).
+- Fuzz targets: canonical JSON, lockfile decoder, policy parser, ignore parser, prose differ, redaction.
+- CI: tests on Linux, macOS and Windows; a coverage gate (≥ 90% for lock, hash, policy); the suite under `unshare -n` with no network; fuzz smoke runs; cross-compilation; a byte-for-byte reproducibility check; and `lockward verify --frozen` on this repository.
 
 ## 7. Release engineering
 
-- GoReleaser: linux/darwin/windows × amd64/arm64, `CGO_ENABLED=0`, `-trimpath`, reproducible `mod_timestamp`.
-- Checksums, Sigstore keyless signatures (cosign), SLSA provenance via GitHub OIDC.
-- Distribution: GitHub Releases, Homebrew tap (`breaktroughf1/tap`), `go install`, npm wrapper (`lockward`) later.
+- GoReleaser: linux/darwin/windows × amd64/arm64, `CGO_ENABLED=0`, `-trimpath`, commit-time `mod_timestamp`, source archive.
+- `checksums.txt` signed keylessly with cosign (Sigstore bundle), SLSA build provenance via `actions/attest-build-provenance`.
+- The GitHub Action verifies the Sigstore identity (`release.yml` at the release tag) and the archive checksum before running the binary.
+- Distribution: GitHub Releases and `go install`. Homebrew tap and npm/PyPI wrappers are planned.
