@@ -46,6 +46,12 @@ linters:
   exclusions:
     presets:
       - std-error-handling
+    rules:
+      # Tests create fixtures with deliberate permission bits (e.g. 0755 to
+      # exercise execute-bit tracking) and read paths they just created.
+      - path: _test\.go
+        linters: [gosec]
+        text: "G30[1-6]"
 
 formatters:
   enable:
