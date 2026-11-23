@@ -1,0 +1,34 @@
+# Lockward policy. Reference: https://github.com/Breaktroughf1/lockward/blob/main/docs/POLICY.md
+version: 1
+
+# Severity per rule: error (fails verify with exit code 2), warning, or off.
+# Defaults are shown; uncomment a line to change it.
+rules:
+  # LW001: error    # unpinned-mcp-package
+  # LW002: error    # source-not-allowed (active only when allow.sources is set)
+  # LW003: error    # hook-executes-network
+  # LW004: warning  # external-url-reference
+  # LW005: warning  # secret-path-reference
+  # LW006: error    # executable-in-skill
+  # LW007: error    # env-value-inline
+  # LW008: error    # auto-approve-tools
+
+allow:
+  # Approved MCP and skill sources as <type>:<pattern>. Types: npm, pypi, oci, url, local.
+  # Leave empty to disable LW002.
+  sources: []
+  #  - npm:@modelcontextprotocol/*
+  #  - oci:ghcr.io/github/*
+  #  - url:mcp.example.com
+  #  - local:*
+
+  # Domains that skills and rules may fetch from or execute (LW004).
+  domains: []
+  #  - github.com
+  #  - "*.example.com"
+
+# Suppress a rule for one entry. A reason is required.
+exceptions: []
+#  - rule: LW006
+#    id: skill:claude-code:pdf-tools
+#    reason: Ships a reviewed helper binary (ticket SEC-123)

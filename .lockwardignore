@@ -1,0 +1,9 @@
+# .lockwardignore: paths Lockward does not pin (gitignore-style patterns).
+# Every pattern is pinned in lockward.lock and printed by 'lockward verify'.
+#
+# Test fixtures: deliberately hostile or malformed agent configurations used
+# by the test suite (unpinned MCP servers, inline secrets, hidden bytecode).
+# They are never loaded by contributors' agents in normal work, and pinning
+# them would make every fixture change a lockfile change.
+testdata/
+internal/*/testdata/

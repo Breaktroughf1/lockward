@@ -1,0 +1,33 @@
+{
+  "entries": [
+    {
+      "agent": "claude-code",
+      "digest": "sha256:8617667e7608d74932c1df3357dba3854f80f83e0eb1cd207fbb2c4124652089",
+      "id": "rules:claude-code:CLAUDE.md",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "windsurf"
+      ],
+      "path": "CLAUDE.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "generic",
+      "digest": "sha256:99ca9a1d283b49de73f523fed693195d3455fb8b978ec61301a14fc336eec8b7",
+      "id": "settings:generic:.lockwardignore",
+      "path": ".lockwardignore",
+      "settings": {
+        "patterns": [
+          "testdata/",
+          "internal/*/testdata/"
+        ]
+      },
+      "surface": "settings"
+    }
+  ],
+  "generated_by": "lockward 0.0.0-20261123222803-2f34b7226cfb+dirty",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "project"
+}

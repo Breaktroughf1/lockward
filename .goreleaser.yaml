@@ -1,0 +1,75 @@
+# GoReleaser v2 configuration. Builds are reproducible: CGO disabled,
+# -trimpath, and file timestamps fixed to the commit time (LW-NFR-05, LW-NFR-08).
+version: 2
+project_name: lockward
+
+builds:
+  - id: lockward
+    main: ./cmd/lockward
+    binary: lockward
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - NOTICE
+      - README.md
+    builds_info:
+      mtime: "{{ .CommitDate }}"
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+# Keyless Sigstore signature over checksums.txt (verifies every archive).
+signs:
+  - id: cosign
+    artifacts: checksum
+    cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    args:
+      - sign-blob
+      - --bundle=${signature}
+      - ${artifact}
+      - --yes
+
+source:
+  enabled: true
+  name_template: "{{ .ProjectName }}_{{ .Version }}_source"
+
+release:
+  github:
+    owner: Breaktroughf1
+    name: lockward
+  prerelease: auto
+  footer: |
+    Verify a download:
+    ```sh
+    cosign verify-blob --bundle checksums.txt.sigstore.json \
+      --certificate-identity "https://github.com/Breaktroughf1/lockward/.github/workflows/release.yml@refs/tags/{{ .Tag }}" \
+      --certificate-oidc-issuer https://token.actions.githubusercontent.com checksums.txt
+    sha256sum --ignore-missing -c checksums.txt
+    gh attestation verify lockward_{{ .Version }}_linux_amd64.tar.gz --repo Breaktroughf1/lockward
+    ```
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
