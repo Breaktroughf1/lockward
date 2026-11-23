@@ -220,6 +220,10 @@ type Asset struct {
 	// HookBaseDir is the directory hook-relative paths resolve against.
 	HookBaseDir string
 
+	// ContentPath is where the content actually lives after resolving
+	// symlinks within the root (set by discovery; empty if not pinned).
+	ContentPath string
+
 	// Facts for policy only; never serialised.
 	InlineSecrets []string // locations like "env.API_KEY"; values are never kept
 	AutoApprove   []string // human-readable auto-approval settings found

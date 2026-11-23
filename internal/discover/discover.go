@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"slices"
 	"sort"
@@ -277,6 +278,7 @@ func (b *builder) rawFile(a *asset.Asset, e *asset.Entry) ([]asset.Problem, erro
 		return nil, err
 	}
 	e.Digest = d
+	a.ContentPath = resolved
 	return nil, nil
 }
 
@@ -308,6 +310,7 @@ func (b *builder) skill(a *asset.Asset, e *asset.Entry) ([]asset.Problem, error)
 			}
 			e.Files = files(tree)
 			e.Digest = hash.SymlinkedTreeDigest(t, tree.Digest)
+			a.ContentPath = path.Dir(resolved)
 			return nil, nil
 		}
 		dir = resolved
@@ -318,6 +321,7 @@ func (b *builder) skill(a *asset.Asset, e *asset.Entry) ([]asset.Problem, error)
 		}
 		e.Files = files(tree)
 		e.Digest = tree.Digest
+		a.ContentPath = path.Dir(dir)
 		return nil, nil
 	case adapter.Missing:
 		return nil, errors.New("skill disappeared during discovery")
@@ -327,6 +331,7 @@ func (b *builder) skill(a *asset.Asset, e *asset.Entry) ([]asset.Problem, error)
 		return nil, err
 	}
 	b.ignored += tree.Ignored
+	a.ContentPath = dir
 	e.Files = files(tree)
 	e.Digest = tree.Digest
 	if target != "" {
