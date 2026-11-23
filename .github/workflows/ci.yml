@@ -1,0 +1,84 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Skip until go.mod exists
+        id: gomod
+        shell: bash
+        run: |
+          if [ -f go.mod ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; echo "No go.mod yet, skipping."; fi
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        if: steps.gomod.outputs.present == 'true'
+        with:
+          go-version-file: go.mod
+      - name: gofmt
+        if: steps.gomod.outputs.present == 'true' && runner.os == 'Linux'
+        run: test -z "$(gofmt -s -l .)" || (gofmt -s -l . && exit 1)
+      - name: vet
+        if: steps.gomod.outputs.present == 'true'
+        run: go vet ./...
+      - name: test
+        if: steps.gomod.outputs.present == 'true'
+        shell: bash
+        run: go test -race -coverprofile=coverage.out ./...
+
+  offline:
+    name: test with networking disabled
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Skip until go.mod exists
+        id: gomod
+        run: |
+          if [ -f go.mod ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        if: steps.gomod.outputs.present == 'true'
+        with:
+          go-version-file: go.mod
+      - name: Download modules (with network)
+        if: steps.gomod.outputs.present == 'true'
+        run: go mod download && go test -c -o /dev/null ./... >/dev/null 2>&1 || true
+      - name: Run tests without network
+        if: steps.gomod.outputs.present == 'true'
+        run: sudo unshare -n -- env "PATH=$PATH" "HOME=$HOME" GOFLAGS=-mod=mod GOPROXY=off go test ./...
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Skip until go.mod exists
+        id: gomod
+        run: |
+          if [ -f go.mod ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        if: steps.gomod.outputs.present == 'true'
+        with:
+          go-version-file: go.mod
+      - uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        if: steps.gomod.outputs.present == 'true'

@@ -1,0 +1,23 @@
+name: Agent adapter request
+description: Request support for a new AI agent or a new config location
+labels: [adapter, good first issue]
+body:
+  - type: input
+    id: agent
+    attributes:
+      label: Agent name and version
+    validations:
+      required: true
+  - type: textarea
+    id: paths
+    attributes:
+      label: Config files the agent loads
+      description: Skills, MCP, hooks, rules. Include user and project paths.
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Link to official documentation
+    validations:
+      required: true

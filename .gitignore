@@ -1,0 +1,24 @@
+# Build output
+/dist/
+/bin/
+/lockward
+*.exe
+*.test
+*.out
+coverage.*
+
+# Go workspace
+go.work
+go.work.sum
+
+# Editors / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+
+# Claude Code local settings (keep shared .claude/settings.json)
+.claude/settings.local.json
+
+# Fuzz cache
+testdata/fuzz/**/corpus-cache/
