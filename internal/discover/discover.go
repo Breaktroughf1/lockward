@@ -45,6 +45,9 @@ type Options struct {
 	Adapters       []adapter.Adapter // nil means Adapters()
 	MaxMembers     int               // per skill tree; 0 means hash.DefaultMaxMembers
 	MaxWalkEntries int               // project walk; 0 means adapter.DefaultMaxWalkEntries
+	// NoIgnore disables .lockwardignore. scan-repo sets it: an untrusted
+	// repository must not be able to hide its own files.
+	NoIgnore bool
 }
 
 // Result is the outcome of a discovery run. Close releases the root.
@@ -57,6 +60,9 @@ type Result struct {
 	Problems []asset.Problem         // sorted
 	Ignore   *ignore.Matcher         // nil when there is no .lockwardignore
 	Ignored  int                     // files inside pinned skills skipped by .lockwardignore
+	// IgnoreFileSkipped is set when NoIgnore was requested and the root
+	// contains a .lockwardignore that was therefore not honoured.
+	IgnoreFileSkipped bool
 
 	root *os.Root
 }
@@ -97,7 +103,11 @@ func Run(ctx context.Context, opts Options) (*Result, error) {
 func (res *Result) run(ctx context.Context, opts Options) error {
 	src := &adapter.Source{FS: res.FS, Scope: opts.Scope, RootDir: res.Root, MaxWalkEntries: opts.MaxWalkEntries}
 	var ignoreEntry *asset.Entry
-	if b, ok, problem := src.ReadConfig(ignore.FileName); ok {
+	if b, ok, problem := src.ReadConfig(ignore.FileName); ok && opts.NoIgnore {
+		_ = b
+		_ = problem
+		res.IgnoreFileSkipped = true
+	} else if ok {
 		if problem != "" {
 			return fmt.Errorf("%w: %s: %s", ErrConfig, ignore.FileName, problem)
 		}

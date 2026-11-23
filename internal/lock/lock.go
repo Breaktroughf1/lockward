@@ -84,7 +84,7 @@ func Decode(b []byte) (*File, error) {
 		return nil, errors.New("parse lockfile: missing lockfile_version")
 	}
 	if *head.LockfileVersion != Version {
-		return nil, fmt.Errorf("%w %d (this lockward reads version %d); upgrade lockward or regenerate with 'lockward lock'",
+		return nil, fmt.Errorf("%w %d (this lockward reads version %d); upgrade lockward, or delete the file and run 'lockward lock' to regenerate it",
 			ErrUnsupportedVersion, *head.LockfileVersion, Version)
 	}
 	var f File

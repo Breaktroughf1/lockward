@@ -92,8 +92,9 @@ type sarifRegion struct {
 	StartLine int `json:"startLine"`
 }
 
-// Drift rule ids used in SARIF output.
+// Rule ids used in SARIF output besides the policy rules.
 const (
+	RuleAutoload      = "agent-autoload"
 	RuleDriftModified = "drift-modified"
 	RuleDriftAdded    = "drift-added"
 	RuleDriftRemoved  = "drift-removed"
@@ -119,6 +120,13 @@ func sarifRules() []sarifRule {
 			"An asset recorded in lockward.lock is no longer present.",
 			"Accept the removal with 'lockward approve <id>'."),
 	}
+	rules = append(rules, sarifRule{
+		ID: RuleAutoload, Name: "agent-autoload", ShortDescription: sarifText{"File an AI agent loads or runs automatically"},
+		FullDescription:      sarifText{"scan-repo found a hook, MCP server or skill that an agent would run or connect to when the repository is opened."},
+		Help:                 sarifText{"Review the item before opening the repository in an agent or IDE."},
+		HelpURI:              InformationURI + "/blob/main/docs/USAGE.md#scan-repo",
+		DefaultConfiguration: sarifRuleLevel{"note"}, Properties: sarifRuleProps{Tags: []string{"security", "supply-chain"}},
+	})
 	for _, r := range policy.Rules {
 		rules = append(rules, sarifRule{
 			ID: r.ID, Name: r.Name, ShortDescription: sarifText{r.Summary}, FullDescription: sarifText{r.Summary},
@@ -187,6 +195,14 @@ func SARIF(w io.Writer, r *Report) error {
 				Locations:           []sarifLocation{location(uri, base, 0)},
 				PartialFingerprints: fingerprint(ruleID, res.ID, ""),
 				Properties:          map[string]string{"entryId": res.ID, "scope": string(s.Scope), "status": string(res.Status)},
+			})
+		}
+		for _, n := range s.Notes {
+			run.Results = append(run.Results, sarifResult{
+				RuleID: RuleAutoload, RuleIndex: idx[RuleAutoload], Level: "note", Message: sarifText{n.Message},
+				Locations:           []sarifLocation{location(n.Path, base, 0)},
+				PartialFingerprints: fingerprint(RuleAutoload, n.ID, ""),
+				Properties:          map[string]string{"entryId": n.ID, "scope": string(s.Scope)},
 			})
 		}
 		for _, f := range s.Findings {

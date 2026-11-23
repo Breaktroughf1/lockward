@@ -4,23 +4,32 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"strings"
 
 	"github.com/Breaktroughf1/lockward/internal/exitcode"
 )
 
 func main() {
-	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	code := runContext(ctx, os.Args[1:], os.Stdout, os.Stderr)
+	stop()
+	os.Exit(code)
 }
 
 // run executes the CLI with args (excluding the program name) and returns the
 // process exit code documented in PRD §8.
 func run(args []string, stdout, stderr io.Writer) int {
+	return runContext(context.Background(), args, stdout, stderr)
+}
+
+func runContext(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	if len(args) == 0 {
 		printUsage(stderr)
 		return int(exitcode.Usage)
@@ -38,10 +47,10 @@ func run(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "lockward: unknown command %q\nRun 'lockward help' for usage.\n", name)
 		return int(exitcode.Usage)
 	}
-	return runCommand(cmd, rest, stdout, stderr)
+	return runCommand(ctx, cmd, rest, stdout, stderr)
 }
 
-func runCommand(cmd *command, args []string, stdout, stderr io.Writer) int {
+func runCommand(ctx context.Context, cmd *command, args []string, stdout, stderr io.Writer) int {
 	fs := newFlagSet(cmd.name)
 	action := cmd.define(fs)
 	pos, err := parseInterspersed(fs, args)
@@ -52,10 +61,11 @@ func runCommand(cmd *command, args []string, stdout, stderr io.Writer) int {
 	if err != nil {
 		err = exitcode.New(exitcode.Usage, "%w", err)
 	} else {
-		err = action(&env{stdout: stdout, stderr: stderr}, pos)
+		err = action(&env{ctx: ctx, stdout: stdout, stderr: stderr}, pos)
 	}
 	code := exitcode.From(err)
-	if err != nil {
+	var ec *exitcode.Error
+	if err != nil && (!errors.As(err, &ec) || ec.Err != nil) {
 		fmt.Fprintf(stderr, "lockward %s: %v\n", cmd.name, err)
 		if code == exitcode.Usage {
 			fmt.Fprintf(stderr, "Run 'lockward %s -h' for usage.\n", cmd.name)

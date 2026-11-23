@@ -37,6 +37,14 @@ type Scope struct {
 	IgnorePatterns []string
 	Ignored        int
 	Notices        []string
+	Notes          []Note // informational items (scan-repo); SARIF level "note"
+}
+
+// Note is an informational SARIF result.
+type Note struct {
+	ID      string
+	Path    string
+	Message string
 }
 
 // Counts summarises a report.

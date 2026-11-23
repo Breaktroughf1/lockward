@@ -82,6 +82,29 @@
               }
             },
             {
+              "id": "agent-autoload",
+              "name": "agent-autoload",
+              "shortDescription": {
+                "text": "File an AI agent loads or runs automatically"
+              },
+              "fullDescription": {
+                "text": "scan-repo found a hook, MCP server or skill that an agent would run or connect to when the repository is opened."
+              },
+              "help": {
+                "text": "Review the item before opening the repository in an agent or IDE."
+              },
+              "helpUri": "https://github.com/Breaktroughf1/lockward/blob/main/docs/USAGE.md#scan-repo",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "supply-chain"
+                ]
+              }
+            },
+            {
               "id": "LW001",
               "name": "unpinned-mcp-package",
               "shortDescription": {
@@ -369,7 +392,7 @@
         },
         {
           "ruleId": "LW001",
-          "ruleIndex": 3,
+          "ruleIndex": 4,
           "level": "error",
           "message": {
             "text": "mcp:cursor:new: MCP server \"new\" runs npm package \"x\" without an exact version. Fix: Pin it."
@@ -394,7 +417,7 @@
         },
         {
           "ruleId": "LW004",
-          "ruleIndex": 6,
+          "ruleIndex": 7,
           "level": "warning",
           "message": {
             "text": "skill:claude-code:pdf tools: instructs fetching or executing from evil.example.com. Fix: Review."
