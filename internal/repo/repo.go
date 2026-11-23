@@ -8,12 +8,10 @@
 package repo
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 	"net/url"
 	"path"
@@ -25,6 +23,7 @@ import (
 	"github.com/Breaktroughf1/lockward/internal/discover"
 	"github.com/Breaktroughf1/lockward/internal/exitcode"
 	"github.com/Breaktroughf1/lockward/internal/policy"
+	"github.com/Breaktroughf1/lockward/internal/textscan"
 )
 
 // Item is one auto-loaded asset.
@@ -232,28 +231,10 @@ func scanURLs(fsys fs.FS, p string, hosts map[string]bool) error {
 	if info, err := f.Stat(); err != nil || !info.Mode().IsRegular() {
 		return err
 	}
-	r := bufio.NewReaderSize(f, 64<<10)
-	var carry []byte
-	for {
-		chunk, err := r.ReadSlice('\n')
-		if len(chunk) > 0 {
-			buf := append(append([]byte{}, carry...), chunk...)
-			if bytes.Contains(buf, []byte("://")) {
-				for _, m := range urlPattern.FindAllSubmatch(buf, -1) {
-					hosts[strings.ToLower(strings.TrimSuffix(string(m[1]), "."))] = true
-				}
+	return textscan.Scan(f, func(block []byte) bool { return bytes.Contains(block, []byte("://")) },
+		func(_ int, b []byte) {
+			for _, m := range urlPattern.FindAllSubmatch(b, -1) {
+				hosts[strings.ToLower(strings.TrimSuffix(string(m[1]), "."))] = true
 			}
-			carry = carry[:0]
-			if errors.Is(err, bufio.ErrBufferFull) && len(chunk) > 512 {
-				carry = append(carry, chunk[len(chunk)-512:]...)
-			}
-		}
-		switch {
-		case err == nil, errors.Is(err, bufio.ErrBufferFull):
-		case errors.Is(err, io.EOF):
-			return nil
-		default:
-			return err
-		}
-	}
+		})
 }

@@ -107,6 +107,7 @@ CycloneDX and SARIF are emitted from small local structs instead of SDKs. No dep
 - Adapter fixtures under `testdata/adapters/<agent>/{project,user}` plus a malformed tree; discovery goldens record every entry and problem.
 - Security invariants from THREAT_MODEL §6 as named tests (`TestInvariant_*`), plus the bypass techniques in [WHAT_IT_CATCHES.md](WHAT_IT_CATCHES.md).
 - Fuzz targets: canonical JSON, lockfile decoder, policy parser, ignore parser, prose differ, redaction.
+- Performance (LW-NFR-04): `verify` on 200 assets totalling 50 MB takes about 0.8 s on a laptop (measured 2026-11-24, Linux amd64); text rules scan 64 KiB blocks with ASCII literal prefilters before any regular expression runs.
 - CI: tests on Linux, macOS and Windows; a coverage gate (≥ 90% for lock, hash, policy); the suite under `unshare -n` with no network; fuzz smoke runs; cross-compilation; a byte-for-byte reproducibility check; and `lockward verify --frozen` on this repository.
 
 ## 7. Release engineering

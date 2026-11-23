@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -13,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/Breaktroughf1/lockward/internal/asset"
+	"github.com/Breaktroughf1/lockward/internal/textscan"
 )
 
 // Rule describes a built-in rule.
@@ -135,6 +135,8 @@ type evaluator struct {
 	in   Input
 	res  Result
 	seen map[string]bool
+
+	lower, blockLower []byte // reusable scratch buffers for prefilters
 }
 
 func (ev *evaluator) add(rule string, e *asset.Entry, p string, line int, msg string) {
@@ -300,6 +302,19 @@ var (
 	}
 )
 
+// asciiLower lowercases A–Z into dst (reused) and leaves every other byte
+// alone. The hint literals are ASCII, so this is exact for prefiltering and
+// avoids Unicode case mapping, which is very slow on binary data.
+func asciiLower(dst, src []byte) []byte {
+	dst = append(dst[:0], src...)
+	for i, c := range dst {
+		if 'A' <= c && c <= 'Z' {
+			dst[i] = c + ('a' - 'A')
+		}
+	}
+	return dst
+}
+
 func containsAny(lower []byte, hints [][]byte) bool {
 	for _, h := range hints {
 		if bytes.Contains(lower, h) {
@@ -312,9 +327,9 @@ func containsAny(lower []byte, hints [][]byte) bool {
 func (ev *evaluator) matchLine(e *asset.Entry, file string, line int, b []byte, urls, secrets, network bool, counts map[string]int) {
 	urls = urls && bytes.Contains(b, []byte("://"))
 	if secrets || network {
-		lower := bytes.ToLower(b)
-		secrets = secrets && containsAny(lower, secretHints)
-		network = network && containsAny(lower, networkHints)
+		ev.lower = asciiLower(ev.lower, b)
+		secrets = secrets && containsAny(ev.lower, secretHints)
+		network = network && containsAny(ev.lower, networkHints)
 	}
 	if urls && ev.on("LW004") && fetchExec.Match(b) {
 		for _, m := range urlPattern.FindAllSubmatch(b, -1) {
@@ -340,15 +355,9 @@ func (ev *evaluator) matchLine(e *asset.Entry, file string, line int, b []byte, 
 	}
 }
 
-// segment is the maximum bytes examined at once; longer lines are scanned in
-// overlapping windows so a pattern cannot hide across a boundary.
-const (
-	segment = 64 << 10
-	overlap = 1 << 10
-)
-
 // scanFile streams a whole file (no size cap, THREAT_MODEL T3) through the
-// selected rules, line by line, with bounded memory.
+// selected rules with bounded memory. Literal prefilters run once per 64 KiB
+// block, and only blocks that could match are split into lines.
 func (ev *evaluator) scanFile(e *asset.Entry, name, display string, urls, secrets, network bool) error {
 	f, err := ev.in.FS.Open(name)
 	if err != nil {
@@ -361,38 +370,26 @@ func (ev *evaluator) scanFile(e *asset.Entry, name, display string, urls, secret
 	if info, err := f.Stat(); err != nil || !info.Mode().IsRegular() {
 		return err
 	}
-	r := bufio.NewReaderSize(f, segment)
+	urls = urls && ev.on("LW004")
+	secrets = secrets && ev.on("LW005")
+	network = network && ev.on("LW003")
+	if !urls && !secrets && !network {
+		return nil
+	}
+	want := func(block []byte) bool {
+		if urls && bytes.Contains(block, []byte("://")) {
+			return true
+		}
+		if secrets || network {
+			ev.blockLower = asciiLower(ev.blockLower, block)
+			return (secrets && containsAny(ev.blockLower, secretHints)) || (network && containsAny(ev.blockLower, networkHints))
+		}
+		return false
+	}
 	counts := map[string]int{}
-	line := 1
-	var carry []byte
-	for {
-		chunk, err := r.ReadSlice('\n')
-		if len(chunk) > 0 {
-			buf := append(append([]byte{}, carry...), chunk...)
-			ev.matchLine(e, display, line, buf, urls, secrets, network, counts)
-			if errors.Is(err, bufio.ErrBufferFull) {
-				carry = append(carry[:0], tail(chunk, overlap)...)
-			} else {
-				carry = carry[:0]
-			}
-			line += bytes.Count(chunk, []byte{'\n'})
-		}
-		switch {
-		case err == nil, errors.Is(err, bufio.ErrBufferFull):
-			continue
-		case errors.Is(err, io.EOF):
-			return nil
-		default:
-			return err
-		}
-	}
-}
-
-func tail(b []byte, n int) []byte {
-	if len(b) <= n {
-		return b
-	}
-	return b[len(b)-n:]
+	return textscan.Scan(f, want, func(n int, b []byte) {
+		ev.matchLine(e, display, n, b, urls, secrets, network, counts)
+	})
 }
 
 // executableKind classifies a file by magic bytes and extension (LW006).

@@ -319,3 +319,10 @@ func FuzzParse(f *testing.F) {
 		}
 	})
 }
+
+func TestASCIILower(t *testing.T) {
+	got := string(asciiLower(nil, []byte("AbC.SSH/\xffÉ")))
+	if got != "abc.ssh/\xffÉ" {
+		t.Errorf("asciiLower = %q", got)
+	}
+}
