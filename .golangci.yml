@@ -38,8 +38,6 @@ linters:
               desc: "No network I/O in default code paths (ADR-0004, THREAT_MODEL §6.2)"
             - pkg: io/ioutil
               desc: "Deprecated; use io and os"
-    misspell:
-      locale: UK
     nolintlint:
       require-explanation: true
       require-specific: true

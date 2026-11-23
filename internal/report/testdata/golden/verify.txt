@@ -1,0 +1,27 @@
+project scope (lockward.lock)
+  policy: lockward.policy.yaml (sha256:333333333333…)
+  ignore: .lockwardignore has 1 pattern(s): *.log; 2 file(s) inside pinned skills ignored
+  note: tools fingerprint for mcp:cursor:gh not re-checked (pass --tools)
+
+  added     mcp:cursor:new  .cursor/mcp.json#/mcpServers/new
+            review it, then accept: lockward approve mcp:cursor:new
+  removed   rules:generic:AGENTS.md  AGENTS.md
+            accept the removal: lockward approve rules:generic:AGENTS.md
+  modified  skill:claude-code:pdf tools  .claude/skills/pdf tools
+            review: lockward diff 'skill:claude-code:pdf tools'
+            accept: lockward approve 'skill:claude-code:pdf tools'
+
+  error   LW001 unpinned-mcp-package  mcp:cursor:new
+          MCP server "new" runs npm package "x" without an exact version
+          at .cursor/mcp.json
+          fix: Pin it.
+  warning LW004 external-url-reference  skill:claude-code:pdf tools
+          instructs fetching or executing from evil.example.com
+          at .claude/skills/pdf tools/SKILL.md:3
+          fix: Review.
+
+  problems (pinned or skipped as noted; review them):
+    cursor: .cursor/hooks.json: parse JSON: unexpected EOF; pinned as raw bytes
+
+policy violation: 8 entries (5 ok, 1 modified, 1 added, 1 removed); 1 error(s), 1 warning(s), 1 suppressed by exceptions
+Additions are reported but do not fail without --frozen.

@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "tool": "lockward",
+  "version": "0.1.0",
+  "frozen": false,
+  "exit_code": 2,
+  "summary": {
+    "entries": 8,
+    "ok": 5,
+    "added": 1,
+    "removed": 1,
+    "modified": 1,
+    "errors": 1,
+    "warnings": 1,
+    "suppressed": 1,
+    "problems": 1
+  },
+  "scopes": [
+    {
+      "scope": "project",
+      "lockfile": "lockward.lock",
+      "policy": {
+        "file": "lockward.policy.yaml",
+        "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+      },
+      "ignore_patterns": [
+        "*.log"
+      ],
+      "ignored_files": 2,
+      "results": [
+        {
+          "id": "hook:claude-code:.claude/settings.json#PreToolUse/0/0",
+          "status": "ok",
+          "surface": "hook",
+          "agent": "claude-code",
+          "path": ".claude/settings.json#/hooks/PreToolUse/0/hooks/0",
+          "locked_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "live_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        },
+        {
+          "id": "mcp:claude-code:stripe",
+          "status": "ok",
+          "surface": "mcp",
+          "agent": "claude-code",
+          "path": ".mcp.json#/mcpServers/stripe",
+          "locked_digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+          "live_digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+        },
+        {
+          "id": "mcp:codex:git",
+          "status": "ok",
+          "surface": "mcp",
+          "agent": "codex",
+          "path": ".codex/config.toml#/mcp_servers/git",
+          "locked_digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+          "live_digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+        },
+        {
+          "id": "mcp:cursor:gh",
+          "status": "ok",
+          "surface": "mcp",
+          "agent": "cursor",
+          "path": ".cursor/mcp.json#/mcpServers/gh",
+          "locked_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "live_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        },
+        {
+          "id": "mcp:cursor:new",
+          "status": "added",
+          "surface": "mcp",
+          "agent": "cursor",
+          "path": ".cursor/mcp.json#/mcpServers/new",
+          "live_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+        },
+        {
+          "id": "rules:generic:AGENTS.md",
+          "status": "removed",
+          "surface": "rules",
+          "agent": "generic",
+          "path": "AGENTS.md",
+          "locked_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        },
+        {
+          "id": "settings:claude-code:.claude/settings.json",
+          "status": "ok",
+          "surface": "settings",
+          "agent": "claude-code",
+          "path": ".claude/settings.json",
+          "locked_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+          "live_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        },
+        {
+          "id": "skill:claude-code:pdf tools",
+          "status": "modified",
+          "surface": "skill",
+          "agent": "claude-code",
+          "path": ".claude/skills/pdf tools",
+          "locked_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "live_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        }
+      ],
+      "findings": [
+        {
+          "rule": "LW001",
+          "name": "unpinned-mcp-package",
+          "severity": "error",
+          "id": "mcp:cursor:new",
+          "path": ".cursor/mcp.json",
+          "message": "MCP server \"new\" runs npm package \"x\" without an exact version",
+          "remediation": "Pin it."
+        },
+        {
+          "rule": "LW004",
+          "name": "external-url-reference",
+          "severity": "warning",
+          "id": "skill:claude-code:pdf tools",
+          "path": ".claude/skills/pdf tools/SKILL.md",
+          "line": 3,
+          "message": "instructs fetching or executing from evil.example.com",
+          "remediation": "Review."
+        }
+      ],
+      "suppressed": 1,
+      "problems": [
+        {
+          "agent": "cursor",
+          "path": ".cursor/hooks.json",
+          "message": "parse JSON: unexpected EOF; pinned as raw bytes"
+        }
+      ],
+      "notices": [
+        "tools fingerprint for mcp:cursor:gh not re-checked (pass --tools)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,285 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:bb258376-148d-5ef0-bfb2-7c63356c7ab8",
+  "version": 1,
+  "metadata": {
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "lockward",
+          "version": "0.1.0",
+          "externalReferences": [
+            {
+              "type": "vcs",
+              "url": "https://github.com/Breaktroughf1/lockward"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "bom-ref": "lockward:root",
+      "name": "demo"
+    },
+    "properties": [
+      {
+        "name": "lockward:scope",
+        "value": "project"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "application",
+      "bom-ref": "hook:claude-code:.claude/settings.json#PreToolUse/0/0",
+      "name": ".claude/settings.json#PreToolUse/0/0",
+      "description": "Agent hook",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        }
+      ],
+      "properties": [
+        {
+          "name": "lockward:id",
+          "value": "hook:claude-code:.claude/settings.json#PreToolUse/0/0"
+        },
+        {
+          "name": "lockward:surface",
+          "value": "hook"
+        },
+        {
+          "name": "lockward:agent",
+          "value": "claude-code"
+        },
+        {
+          "name": "lockward:path",
+          "value": ".claude/settings.json#/hooks/PreToolUse/0/hooks/0"
+        },
+        {
+          "name": "lockward:hook_event",
+          "value": "PreToolUse"
+        }
+      ]
+    },
+    {
+      "type": "application",
+      "bom-ref": "mcp:claude-code:stripe",
+      "name": "stripe",
+      "description": "MCP server",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "8888888888888888888888888888888888888888888888888888888888888888"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "other",
+          "url": "https://mcp.stripe.com"
+        }
+      ],
+      "properties": [
+        {
+          "name": "lockward:id",
+          "value": "mcp:claude-code:stripe"
+        },
+        {
+          "name": "lockward:surface",
+          "value": "mcp"
+        },
+        {
+          "name": "lockward:agent",
+          "value": "claude-code"
+        },
+        {
+          "name": "lockward:path",
+          "value": ".mcp.json#/mcpServers/stripe"
+        },
+        {
+          "name": "lockward:transport",
+          "value": "http"
+        }
+      ]
+    },
+    {
+      "type": "application",
+      "bom-ref": "mcp:codex:git",
+      "name": "git",
+      "version": "0.6.2",
+      "description": "MCP server",
+      "purl": "pkg:pypi/mcp-server-git@0.6.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9999999999999999999999999999999999999999999999999999999999999999"
+        }
+      ],
+      "properties": [
+        {
+          "name": "lockward:id",
+          "value": "mcp:codex:git"
+        },
+        {
+          "name": "lockward:surface",
+          "value": "mcp"
+        },
+        {
+          "name": "lockward:agent",
+          "value": "codex"
+        },
+        {
+          "name": "lockward:path",
+          "value": ".codex/config.toml#/mcp_servers/git"
+        },
+        {
+          "name": "lockward:transport",
+          "value": "stdio"
+        }
+      ]
+    },
+    {
+      "type": "application",
+      "bom-ref": "mcp:cursor:gh",
+      "name": "gh",
+      "version": "1.2.3",
+      "description": "MCP server",
+      "purl": "pkg:npm/%40scope/gh-mcp@1.2.3",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      ],
+      "properties": [
+        {
+          "name": "lockward:id",
+          "value": "mcp:cursor:gh"
+        },
+        {
+          "name": "lockward:surface",
+          "value": "mcp"
+        },
+        {
+          "name": "lockward:agent",
+          "value": "cursor"
+        },
+        {
+          "name": "lockward:path",
+          "value": ".cursor/mcp.json#/mcpServers/gh"
+        },
+        {
+          "name": "lockward:transport",
+          "value": "stdio"
+        },
+        {
+          "name": "lockward:tools_fingerprint",
+          "value": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "rules:generic:AGENTS.md",
+      "name": "AGENTS.md",
+      "description": "Agent rules or instruction file",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
+      ],
+      "properties": [
+        {
+          "name": "lockward:id",
+          "value": "rules:generic:AGENTS.md"
+        },
+        {
+          "name": "lockward:surface",
+          "value": "rules"
+        },
+        {
+          "name": "lockward:agent",
+          "value": "generic"
+        },
+        {
+          "name": "lockward:path",
+          "value": "AGENTS.md"
+        },
+        {
+          "name": "lockward:loaded_by",
+          "value": "codex,cursor"
+        }
+      ]
+    },
+    {
+      "type": "data",
+      "bom-ref": "settings:claude-code:.claude/settings.json",
+      "name": ".claude/settings.json",
+      "description": "Security-relevant agent settings",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7777777777777777777777777777777777777777777777777777777777777777"
+        }
+      ],
+      "properties": [
+        {
+          "name": "lockward:id",
+          "value": "settings:claude-code:.claude/settings.json"
+        },
+        {
+          "name": "lockward:surface",
+          "value": "settings"
+        },
+        {
+          "name": "lockward:agent",
+          "value": "claude-code"
+        },
+        {
+          "name": "lockward:path",
+          "value": ".claude/settings.json"
+        }
+      ]
+    },
+    {
+      "type": "application",
+      "bom-ref": "skill:claude-code:pdf tools",
+      "name": "pdf tools",
+      "description": "Agent skill (1 files)",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "properties": [
+        {
+          "name": "lockward:id",
+          "value": "skill:claude-code:pdf tools"
+        },
+        {
+          "name": "lockward:surface",
+          "value": "skill"
+        },
+        {
+          "name": "lockward:agent",
+          "value": "claude-code"
+        },
+        {
+          "name": "lockward:path",
+          "value": ".claude/skills/pdf tools"
+        },
+        {
+          "name": "lockward:approved_by",
+          "value": "dev@example.com"
+        }
+      ]
+    }
+  ]
+}
