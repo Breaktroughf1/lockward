@@ -1,0 +1,59 @@
+# golangci-lint v2 configuration. Pinned version: see .github/workflows/ci.yml.
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: standard # errcheck, govet, ineffassign, staticcheck, unused
+  enable:
+    - copyloopvar
+    - depguard
+    - errorlint
+    - gocritic
+    - gosec
+    - misspell
+    - nolintlint
+    - revive
+    - usestdlibvars
+  settings:
+    depguard:
+      rules:
+        # THREAT_MODEL §6 invariants 1 and 2: never execute scanned content,
+        # no network I/O in default code paths. Enforced at lint time.
+        security-invariants:
+          files:
+            - "$all"
+            - "!$test"
+          deny:
+            - pkg: os/exec
+              desc: "Lockward never executes anything (THREAT_MODEL §6.1, CLAUDE.md rule 1)"
+            - pkg: plugin
+              desc: "Lockward never loads code at runtime (THREAT_MODEL §6.1)"
+            - pkg: net
+              desc: "No network I/O in default code paths (ADR-0004, THREAT_MODEL §6.2)"
+            - pkg: net/http
+              desc: "No network I/O in default code paths (ADR-0004, THREAT_MODEL §6.2)"
+            - pkg: net/rpc
+              desc: "No network I/O in default code paths (ADR-0004, THREAT_MODEL §6.2)"
+            - pkg: io/ioutil
+              desc: "Deprecated; use io and os"
+    misspell:
+      locale: UK
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+  exclusions:
+    presets:
+      - std-error-handling
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/Breaktroughf1/lockward
