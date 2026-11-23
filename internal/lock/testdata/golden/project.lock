@@ -1,0 +1,99 @@
+{
+  "entries": [
+    {
+      "agent": "claude-code",
+      "approved": {
+        "by": "dev@example.com"
+      },
+      "digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "hook": {
+        "command": "./scripts/guard.sh",
+        "event": "PreToolUse",
+        "matcher": "Bash",
+        "type": "command"
+      },
+      "id": "hook:claude-code:.claude/settings.json#PreToolUse/0/0",
+      "path": ".claude/settings.json#/hooks/PreToolUse/0/hooks/0",
+      "referenced_files": [
+        {
+          "digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "path": "scripts/guard.sh"
+        }
+      ],
+      "surface": "hook"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "id": "mcp:cursor:github",
+      "path": ".cursor/mcp.json#/mcpServers/github",
+      "server": {
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-github@2.1.0"
+        ],
+        "command": "npx",
+        "env_keys": [
+          "GITHUB_TOKEN"
+        ],
+        "package": {
+          "ecosystem": "npm",
+          "name": "@modelcontextprotocol/server-github",
+          "version": "2.1.0"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "@modelcontextprotocol/server-github",
+        "type": "npm"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "generic",
+      "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "id": "rules:generic:AGENTS.md",
+      "loaded_by": [
+        "codex",
+        "copilot",
+        "cursor"
+      ],
+      "path": "AGENTS.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "files": [
+        {
+          "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 2140
+        },
+        {
+          "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "mode": "0755",
+          "path": "scripts/run.py",
+          "size": 812
+        },
+        {
+          "path": "latest",
+          "symlink": "scripts/run.py"
+        }
+      ],
+      "id": "skill:claude-code:pdf-tools",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "cursor"
+      ],
+      "path": ".claude/skills/pdf-tools",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward 0.1.0",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "project"
+}
