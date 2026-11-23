@@ -23,7 +23,7 @@ Data flow for `verify`:
 ## 2. Repository layout
 
 ```
-cmd/lockward/            main package, CLI wiring only (cobra or stdlib flag — see ADR)
+cmd/lockward/            main package, CLI wiring only (stdlib flag — ADR-0005)
 internal/adapter/        one package per agent; no cross-adapter imports
 internal/asset/          Asset and Entry types shared across packages
 internal/discover/       adapter registry, scope roots, ignore handling
@@ -48,6 +48,7 @@ docs/                    PRD, SPEC, threat model, ADRs
 | Licence | Apache-2.0 | [0002](adr/0002-licence-apache-2.md) |
 | No LLM in decision path | Deterministic only | [0003](adr/0003-no-llm-in-decision-path.md) |
 | Offline by default | No network in default paths | [0004](adr/0004-offline-by-default.md) |
+| CLI parsing | Stdlib `flag`, no CLI framework | [0005](adr/0005-cli-stdlib-flag.md) |
 
 ## 4. Adapter contract
 
@@ -78,7 +79,7 @@ Rules:
 ## 5. Dependencies policy
 
 Minimal and justified. Expected candidates (each needs a one-line justification in an ADR or `go.mod` comment):
-- CLI: `spf13/cobra` *or* stdlib `flag` (decide in week 1).
+- CLI: none; stdlib `flag` ([ADR-0005](adr/0005-cli-stdlib-flag.md)).
 - YAML: `gopkg.in/yaml.v3` / `go.yaml.in/yaml/v3`.
 - TOML (Codex): `github.com/pelletier/go-toml/v2`.
 - CycloneDX: `github.com/CycloneDX/cyclonedx-go`.
