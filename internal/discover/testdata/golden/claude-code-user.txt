@@ -1,0 +1,126 @@
+{
+  "entries": [
+    {
+      "agent": "claude-code",
+      "digest": "sha256:b07ca6727b14e6f65838645bb24a9250b7628ddd10247d7fda978370a3c4d9c6",
+      "hook": {
+        "command": "~/.claude/hooks/notify.sh",
+        "event": "Notification",
+        "type": "command"
+      },
+      "id": "hook:claude-code:.claude/settings.json#Notification/0/0",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "windsurf"
+      ],
+      "path": ".claude/settings.json#/hooks/Notification/0/hooks/0",
+      "referenced_files": [
+        {
+          "digest": "sha256:09d6db6b2cb8d42b167435cf15a650b0023efe92efe996a83f47a3ede665fd2d",
+          "path": ".claude/hooks/notify.sh"
+        }
+      ],
+      "surface": "hook"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:d842523406020312a9d218c9ca9f97827e948a76bbafa6931a2c9d5be26fe6c1",
+      "id": "mcp:claude-code:memory",
+      "path": ".claude.json#/mcpServers/memory",
+      "server": {
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-memory@0.6.0"
+        ],
+        "command": "npx",
+        "package": {
+          "ecosystem": "npm",
+          "name": "@modelcontextprotocol/server-memory",
+          "spec": "@modelcontextprotocol/server-memory@0.6.0",
+          "version": "0.6.0"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "@modelcontextprotocol/server-memory",
+        "resolved": "@modelcontextprotocol/server-memory@0.6.0",
+        "type": "npm"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:4531e13e11d9bd3094eb843773e56728f0130289e92a54f8692c631192b8fe8e",
+      "id": "mcp:claude-code:proj@local/db",
+      "path": ".claude.json#/projects/~1home~1dev~1proj/mcpServers/db",
+      "server": {
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "postgres-mcp:latest"
+        ],
+        "command": "docker",
+        "package": {
+          "ecosystem": "oci",
+          "name": "postgres-mcp",
+          "spec": "postgres-mcp:latest",
+          "version": "latest"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "postgres-mcp",
+        "resolved": "postgres-mcp:latest",
+        "type": "oci"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:28787f699b4a4f08e5630492fb983966b9701f9ee82fd366435107320aee2a55",
+      "id": "rules:claude-code:.claude/CLAUDE.md",
+      "path": ".claude/CLAUDE.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:8096f1b103fee77f19d0046481b39d700f6f2d49cfc940de7081efeb5c9682dd",
+      "id": "settings:claude-code:.claude/settings.json",
+      "path": ".claude/settings.json",
+      "settings": {
+        "statusLine": {
+          "command": "~/.claude/statusline.sh",
+          "type": "command"
+        }
+      },
+      "surface": "settings"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:78cdb425402685e52c5d9ae5329b11040c9ac6d17dea4e63495b3c97ecaa3e57",
+      "files": [
+        {
+          "digest": "sha256:5adc5029830dfabfb1aa770fbb0c0a8056261cd6fda711f7b9f96e3f3d53ae39",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 29
+        }
+      ],
+      "id": "skill:claude-code:my-skill",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "cursor"
+      ],
+      "path": ".claude/skills/my-skill",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "user"
+}
+--- problems ---

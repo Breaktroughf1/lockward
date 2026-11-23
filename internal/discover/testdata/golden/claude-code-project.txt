@@ -1,0 +1,299 @@
+{
+  "entries": [
+    {
+      "agent": "claude-code",
+      "digest": "sha256:5bafaf9d76d143a449cb06f8e199c112dc6bacedfd98c74bd6f56f390b642970",
+      "hook": {
+        "command": "curl -s -X POST https://telemetry.example.com/log",
+        "event": "PostToolUse",
+        "matcher": "Edit|Write",
+        "type": "command"
+      },
+      "id": "hook:claude-code:.claude/settings.json#PostToolUse/0/0",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "windsurf"
+      ],
+      "path": ".claude/settings.json#/hooks/PostToolUse/0/hooks/0",
+      "surface": "hook"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:a87a2307be09e7af83557000ba2076b79acc3c374acc13238827efdfc1d3365f",
+      "hook": {
+        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard.sh",
+        "event": "PreToolUse",
+        "matcher": "Bash",
+        "type": "command"
+      },
+      "id": "hook:claude-code:.claude/settings.json#PreToolUse/0/0",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "windsurf"
+      ],
+      "path": ".claude/settings.json#/hooks/PreToolUse/0/hooks/0",
+      "referenced_files": [
+        {
+          "digest": "sha256:8a462e6c8487cecf02dcd424b9697b9c5853e0d996fdb6b580e2d9d8990e8c39",
+          "path": ".claude/hooks/guard.sh"
+        }
+      ],
+      "surface": "hook"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:0bb2ac28c4068d1e5031bbe4bd3c276dd0b94ab7a84fb952543a5973b629a82a",
+      "id": "mcp:claude-code:fetch",
+      "loaded_by": [
+        "claude-code",
+        "copilot"
+      ],
+      "path": ".mcp.json#/mcpServers/fetch",
+      "server": {
+        "args": [
+          "mcp-server-fetch"
+        ],
+        "command": "uvx",
+        "package": {
+          "ecosystem": "pypi",
+          "name": "mcp-server-fetch",
+          "spec": "mcp-server-fetch"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "mcp-server-fetch",
+        "resolved": "mcp-server-fetch",
+        "type": "pypi"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:627edf8bccfb7906aac6238578d0208a2ca2795713ad0e1c35a8086f21a8a9a4",
+      "id": "mcp:claude-code:github",
+      "loaded_by": [
+        "claude-code",
+        "copilot"
+      ],
+      "path": ".mcp.json#/mcpServers/github",
+      "server": {
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-github@2.1.0"
+        ],
+        "command": "npx",
+        "env_keys": [
+          "GITHUB_TOKEN"
+        ],
+        "package": {
+          "ecosystem": "npm",
+          "name": "@modelcontextprotocol/server-github",
+          "spec": "@modelcontextprotocol/server-github@2.1.0",
+          "version": "2.1.0"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "@modelcontextprotocol/server-github",
+        "resolved": "@modelcontextprotocol/server-github@2.1.0",
+        "type": "npm"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:6eef26a1f6be087a5d8715536919e8ddb726636047c900ad4de632bd1e6087b1",
+      "id": "mcp:claude-code:leaky",
+      "loaded_by": [
+        "claude-code",
+        "copilot"
+      ],
+      "path": ".mcp.json#/mcpServers/leaky",
+      "server": {
+        "args": [
+          "server.js"
+        ],
+        "command": "node",
+        "env_keys": [
+          "API_KEY"
+        ],
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "node",
+        "type": "local"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:968bf7d9a1f3fe6fccd73f375183a0e22e635219b3cfb54946a93923a0b589f4",
+      "id": "mcp:claude-code:stripe",
+      "loaded_by": [
+        "claude-code",
+        "copilot"
+      ],
+      "path": ".mcp.json#/mcpServers/stripe",
+      "server": {
+        "header_keys": [
+          "Authorization"
+        ],
+        "transport": "http",
+        "url": "https://mcp.stripe.com"
+      },
+      "source": {
+        "ref": "mcp.stripe.com",
+        "type": "url"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:5c3530a017c007374e5a1701ecfb8d1e1838c5241dba5fed6c96b3203bb2b1e9",
+      "id": "rules:claude-code:.claude/CLAUDE.md",
+      "path": ".claude/CLAUDE.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:d102bcc8d0a03fbc2d6c5d8e393b0ecfb61b05c610e6094ddf5d103fc759279a",
+      "id": "rules:claude-code:.claude/agents/reviewer.md",
+      "loaded_by": [
+        "claude-code",
+        "copilot"
+      ],
+      "path": ".claude/agents/reviewer.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:7eaca4b37e614fc26f4f34689f44a23d10de9d9005279ff16fc2b1413df77d3a",
+      "id": "rules:claude-code:.claude/commands/deploy.md",
+      "path": ".claude/commands/deploy.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:2d812d6fdf8ecb4d6d131cf2d3f289294aa941e08ff5776bfab097cae4a099ac",
+      "id": "rules:claude-code:.claude/rules/style.md",
+      "path": ".claude/rules/style.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:f92d57d6b2779e46896eaddc20111c408ee37a81bcffbefaa935b749eafdd9dc",
+      "id": "rules:claude-code:CLAUDE.local.md",
+      "path": "CLAUDE.local.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:ef2fab998a013c168a2417911377aabbd3251bf0f69f0e9f2beaccd42a83d40d",
+      "id": "rules:claude-code:CLAUDE.md",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "windsurf"
+      ],
+      "path": "CLAUDE.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:f82a858caa53bd1a89ed3f1e3526770096ec6f5a3e3078c7c06a0a4ff9a90ca9",
+      "id": "rules:claude-code:sub/CLAUDE.md",
+      "path": "sub/CLAUDE.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:2cce2123c543c77d55f4d4cc680a2375845130c8fe398f9ce8c52e3eeb806884",
+      "id": "settings:claude-code:.claude/settings.json",
+      "path": ".claude/settings.json",
+      "settings": {
+        "enableAllProjectMcpServers": true,
+        "env": {
+          "keys": [
+            "API_TOKEN"
+          ]
+        },
+        "permissions": {
+          "allow": [
+            "Bash(*)",
+            "Read"
+          ],
+          "deny": [
+            "Read(./.env)"
+          ]
+        }
+      },
+      "surface": "settings"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:17952ee24d42a8a5c2d85ceae6c1545fc4f7da458fe107b640613444e052b0ec",
+      "files": [
+        {
+          "digest": "sha256:b17eae5845111ba898e14840f9795fda27da9a7626a9722ac418b94b1fbbe635",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 35
+        }
+      ],
+      "id": "skill:claude-code:nested-skill",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "cursor"
+      ],
+      "path": "pkg/.claude/skills/nested-skill",
+      "surface": "skill"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:5ed5136edf79fc97ccc8cfc9974600c4bcecbc4fbbcbe4bf950ed838d5e2fcb6",
+      "files": [
+        {
+          "digest": "sha256:6e62fbd8328905c5624012af648965aa3d8fbffd8ebbe3e882ac3a0f8864ecde",
+          "mode": "0644",
+          "path": ".hidden-config",
+          "size": 15
+        },
+        {
+          "digest": "sha256:8c245fbb8b221cfb41244c8160557fb6fa14a63a55659e64fab65b6de304bf3b",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 72
+        },
+        {
+          "digest": "sha256:cd5f8fa19cd0a9096f61389dd5fc0d28aec8a362946e2bd6a41afe54a1a0a84d",
+          "mode": "0644",
+          "path": "assets/logo.bin",
+          "size": 7
+        },
+        {
+          "digest": "sha256:03e693d9f2f687e0f40e36a8df7fcb4d1c22974012b7c2a55c000eb30f305824",
+          "mode": "0644",
+          "path": "scripts/run.py",
+          "size": 15
+        }
+      ],
+      "id": "skill:claude-code:pdf-tools",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "cursor"
+      ],
+      "path": ".claude/skills/pdf-tools",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "project"
+}
+--- problems ---

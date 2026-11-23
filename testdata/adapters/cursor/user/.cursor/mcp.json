@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "search": {
+      "url": "https://search.example.com/sse?api_key=abc123secret&region=eu"
+    }
+  }
+}

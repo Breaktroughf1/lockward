@@ -1,0 +1,67 @@
+{
+  "entries": [
+    {
+      "agent": "copilot",
+      "digest": "sha256:fa6ab565f07a305a63bde5051939cc1bd232d66198166243374dfdb376a1523d",
+      "hook": {
+        "command": "echo hi",
+        "event": "sessionStart",
+        "type": "command"
+      },
+      "id": "hook:copilot:.copilot/hooks/h.json#sessionStart/0",
+      "path": ".copilot/hooks/h.json#/hooks/sessionStart/0",
+      "surface": "hook"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:2b6090398f16bb437eeed485e8cb2d3c32375e798fa5b21742e32fc27ce6e83a",
+      "id": "mcp:copilot:pw",
+      "path": ".copilot/mcp-config.json#/mcpServers/pw",
+      "server": {
+        "args": [
+          "-y",
+          "@playwright/mcp@0.0.40"
+        ],
+        "command": "npx",
+        "package": {
+          "ecosystem": "npm",
+          "name": "@playwright/mcp",
+          "spec": "@playwright/mcp@0.0.40",
+          "version": "0.0.40"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "@playwright/mcp",
+        "resolved": "@playwright/mcp@0.0.40",
+        "type": "npm"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:e1996f277b852a4a3d0fc186177c877df811642f9b541d7950cc0271084635a0",
+      "id": "rules:copilot:.copilot/copilot-instructions.md",
+      "path": ".copilot/copilot-instructions.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:02080cd247e0b6579c111e116fbf87e6f1a42aa9ff162358738aef877b667f9b",
+      "id": "settings:copilot:.config/Code/User/settings.json",
+      "path": ".config/Code/User/settings.json",
+      "settings": {
+        "chat.tools.terminal.autoApprove": {
+          "/.*/": true,
+          "rm": false
+        }
+      },
+      "surface": "settings"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "user"
+}
+--- problems ---

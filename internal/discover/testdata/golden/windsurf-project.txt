@@ -1,0 +1,108 @@
+{
+  "entries": [
+    {
+      "agent": "windsurf",
+      "digest": "sha256:a398be40c19d35a7eec1769c30e81dc247fc5fc1016cc4b87d48364c4a60ff31",
+      "hook": {
+        "command": "./scripts/check-command.sh",
+        "event": "PreToolUse",
+        "matcher": "exec",
+        "type": "command"
+      },
+      "id": "hook:windsurf:.devin/hooks.v1.json#PreToolUse/0/0",
+      "path": ".devin/hooks.v1.json#/PreToolUse/0/hooks/0",
+      "referenced_files": [
+        {
+          "digest": "sha256:306c6ca7407560340797866e077e053627ad409277d1b9da58106fce4cf717cb",
+          "path": "scripts/check-command.sh"
+        }
+      ],
+      "surface": "hook"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:eb65737da37392f85cddd0d37c9eb0492de5c1b3c7f402938caaf618c792990b",
+      "id": "mcp:windsurf:linear",
+      "path": ".devin/mcp_config.json#/mcpServers/linear",
+      "server": {
+        "transport": "sse",
+        "url": "https://mcp.linear.app/sse"
+      },
+      "source": {
+        "ref": "mcp.linear.app",
+        "type": "url"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:ef7cdfddde0d84ddf93f204b620e31374a1dfd11cb4af085e94847ccdfc68f06",
+      "id": "rules:windsurf:.devin/rules/d.md",
+      "path": ".devin/rules/d.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:4b44048e9bb8e03ec03481ebd3d85c45b645eae49a2fce91ed36133577a841ef",
+      "id": "rules:windsurf:.devin/workflows/release.md",
+      "path": ".devin/workflows/release.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:cd72574f8f633f80c563d44fffa83b293458f280e1669e3705623273f08c3fc2",
+      "id": "rules:windsurf:.windsurf/rules/r.md",
+      "path": ".windsurf/rules/r.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:7c4c6176c48089a830ee2d83038aa280a3e1628230639100594e68d0fe02ac31",
+      "id": "rules:windsurf:.windsurfrules",
+      "path": ".windsurfrules",
+      "surface": "rules"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:0e5eb4463be17827ca7157185e5164b5ab15d1e79690d4f854118a3bf248de3c",
+      "id": "rules:windsurf:AGENTS.local.md",
+      "path": "AGENTS.local.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:2d2f21b6d57bb2c46108d5ef7253970020ffc01eed2399dc085391d7cc73bbd9",
+      "id": "settings:windsurf:.devin/config.json",
+      "path": ".devin/config.json",
+      "settings": {
+        "permissions": {
+          "allow": [
+            "mcp__*"
+          ],
+          "deny": []
+        }
+      },
+      "surface": "settings"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:87466071ebf142e7871f1297eaa6a003031d0ce3acfabb85871b70b46ec2397b",
+      "files": [
+        {
+          "digest": "sha256:4e922e0391b15189a6ee1fd981960f104907bbbcfc350ff76e66d80a0904a5fb",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 21
+        }
+      ],
+      "id": "skill:windsurf:ds",
+      "path": ".devin/skills/ds",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "project"
+}
+--- problems ---

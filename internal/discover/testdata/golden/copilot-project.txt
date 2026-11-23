@@ -1,0 +1,150 @@
+{
+  "entries": [
+    {
+      "agent": "copilot",
+      "digest": "sha256:01d2ec86193c7fdc5ba71ea5a7b76d1704cdc175a718c63b9cdab7d7d6147711",
+      "hook": {
+        "bash": "./scripts/audit.sh",
+        "event": "preToolUse",
+        "powershell": "./scripts/audit.ps1",
+        "type": "command"
+      },
+      "id": "hook:copilot:.github/hooks/audit.json#preToolUse/0",
+      "path": ".github/hooks/audit.json#/hooks/preToolUse/0",
+      "referenced_files": [
+        {
+          "digest": "sha256:306c6ca7407560340797866e077e053627ad409277d1b9da58106fce4cf717cb",
+          "path": "scripts/audit.sh"
+        }
+      ],
+      "surface": "hook"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:9b851f04ab84446cdf466a0904ccb01650aa66e55d391940e624c57eaedfb761",
+      "id": "mcp:copilot:api",
+      "path": ".vscode/mcp.json#/servers/api",
+      "server": {
+        "header_keys": [
+          "Authorization"
+        ],
+        "transport": "http",
+        "url": "https://api.example.com/mcp"
+      },
+      "source": {
+        "ref": "api.example.com",
+        "type": "url"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:78197383d25d2a8f3ea303745b4844fda0fb6ed0bad99044ec807d6c02a0ac80",
+      "id": "mcp:copilot:cli-only",
+      "path": ".github/mcp.json#/mcpServers/cli-only",
+      "server": {
+        "args": [
+          "cli-mcp==1.0.0"
+        ],
+        "command": "uvx",
+        "package": {
+          "ecosystem": "pypi",
+          "name": "cli-mcp",
+          "spec": "cli-mcp==1.0.0",
+          "version": "1.0.0"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "cli-mcp",
+        "resolved": "cli-mcp==1.0.0",
+        "type": "pypi"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:d06b60a231c0d837eee6529974a34f45224e2f9a726ae88acaf700740b49dce6",
+      "id": "mcp:copilot:playwright",
+      "path": ".vscode/mcp.json#/servers/playwright",
+      "server": {
+        "args": [
+          "-y",
+          "@playwright/mcp@latest"
+        ],
+        "command": "npx",
+        "package": {
+          "ecosystem": "npm",
+          "name": "@playwright/mcp",
+          "spec": "@playwright/mcp@latest"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "@playwright/mcp",
+        "resolved": "@playwright/mcp@latest",
+        "type": "npm"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:1cbc104c44de69ccb69541da5392d4cf280c4c118fa13e399c46ffaf90ca4980",
+      "id": "rules:copilot:.github/agents/planner.agent.md",
+      "path": ".github/agents/planner.agent.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:b84a87bd21c002cd7636f8f91aa16c2c6354954f11ffbfae6c16231614253dcd",
+      "id": "rules:copilot:.github/copilot-instructions.md",
+      "path": ".github/copilot-instructions.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:c81882edfb8dd9ca4f6311109fa83e3410c79f93671c04ddec47f33397f758cf",
+      "id": "rules:copilot:.github/instructions/ts.instructions.md",
+      "path": ".github/instructions/ts.instructions.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:0e59bc762502cc07b991fd329c11ba4c60ffd2cb1b0ac24704f347d8e6de680f",
+      "id": "rules:copilot:.github/prompts/review.prompt.md",
+      "path": ".github/prompts/review.prompt.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:8c441c30fd7426997dd253dffc3dc95cbc7c7e49a552f1ed175d8cf39a79bd57",
+      "id": "settings:copilot:.vscode/settings.json",
+      "path": ".vscode/settings.json",
+      "settings": {
+        "chat.tools.global.autoApprove": true,
+        "chat.useAgentsMdFile": true
+      },
+      "surface": "settings"
+    },
+    {
+      "agent": "copilot",
+      "digest": "sha256:1b00dbe50d9a0e37537fa354493f83e3203d98ac9193b8ed22d5ec48effe2381",
+      "files": [
+        {
+          "digest": "sha256:f0a6d736109e7e686cbb476d8df75526822d31681fef8e9e7b4eea7ea0ec2d30",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 21
+        }
+      ],
+      "id": "skill:copilot:cs",
+      "path": ".github/skills/cs",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "project"
+}
+--- problems ---

@@ -1,0 +1,79 @@
+{
+  "entries": [
+    {
+      "agent": "windsurf",
+      "digest": "sha256:dd10b4694e8dc8fae3a549f12b1dfe9cd915965467f2d8f553d26fae04bd1300",
+      "id": "mcp:windsurf:fs",
+      "path": ".config/devin/mcp_config.json#/mcpServers/fs",
+      "server": {
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-filesystem@2025.1.14"
+        ],
+        "command": "npx",
+        "package": {
+          "ecosystem": "npm",
+          "name": "@modelcontextprotocol/server-filesystem",
+          "spec": "@modelcontextprotocol/server-filesystem@2025.1.14",
+          "version": "2025.1.14"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "@modelcontextprotocol/server-filesystem",
+        "resolved": "@modelcontextprotocol/server-filesystem@2025.1.14",
+        "type": "npm"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:4dc0a2c3efeb0f14bef0a63fcd633b9001c13a0b35cb688749031a8cd9d14fa8",
+      "id": "mcp:windsurf:legacy",
+      "path": ".codeium/windsurf/mcp_config.json#/mcpServers/legacy",
+      "server": {
+        "transport": "http",
+        "url": "https://legacy.example.com/mcp"
+      },
+      "source": {
+        "ref": "legacy.example.com",
+        "type": "url"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:29af8d0e694ac71dd02ce12e66d320388d8f6bd1d6cb1a558cba596450f47577",
+      "id": "rules:windsurf:.codeium/windsurf/global_workflows/g.md",
+      "path": ".codeium/windsurf/global_workflows/g.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:28787f699b4a4f08e5630492fb983966b9701f9ee82fd366435107320aee2a55",
+      "id": "rules:windsurf:.codeium/windsurf/memories/global_rules.md",
+      "path": ".codeium/windsurf/memories/global_rules.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "windsurf",
+      "digest": "sha256:d09fdcbaf3ce8888481120318895cb54265381bf03e911165aed63ee85ca3214",
+      "files": [
+        {
+          "digest": "sha256:a1d9b654f03e97897460f8bf0ad5a29962f7efd20bb3373533184cb16f78e87c",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 21
+        }
+      ],
+      "id": "skill:windsurf:us",
+      "path": ".config/devin/skills/us",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "user"
+}
+--- problems ---

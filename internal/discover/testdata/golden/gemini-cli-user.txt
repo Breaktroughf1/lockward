@@ -1,0 +1,79 @@
+{
+  "entries": [
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:6b625850035da960957260a41d8bd43a22516936696074be48111b858ae51c28",
+      "hook": {
+        "command": "echo start",
+        "event": "SessionStart",
+        "type": "command"
+      },
+      "id": "hook:gemini-cli:.gemini/extensions/ext1/hooks/hooks.json#SessionStart/0/0",
+      "path": ".gemini/extensions/ext1/hooks/hooks.json#/hooks/SessionStart/0/hooks/0",
+      "surface": "hook"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:334a74b31bbcf3fae87884292cb79c94c0d16d9257e52370e07c287a612d069e",
+      "id": "mcp:gemini-cli:ext1/x",
+      "path": ".gemini/extensions/ext1/gemini-extension.json#/mcpServers/x",
+      "server": {
+        "args": [
+          "ext-mcp"
+        ],
+        "command": "npx",
+        "package": {
+          "ecosystem": "npm",
+          "name": "ext-mcp",
+          "spec": "ext-mcp"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "ext-mcp",
+        "resolved": "ext-mcp",
+        "type": "npm"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:68a9dfcf6582697663e1733f5c930614a3ee25670e1825249fd222cfbf7d04a1",
+      "id": "rules:gemini-cli:.gemini/GEMINI.md",
+      "path": ".gemini/GEMINI.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:9841f21a568df8dfa4969381a4fc2436b920fce76e128dba3e2883684d7b4351",
+      "files": [
+        {
+          "digest": "sha256:9f12d005a5b2c20f2bc9ad017d14dd6e8ba8727c19e2ba53f913a56490e0744d",
+          "mode": "0644",
+          "path": "GEMINI.md",
+          "size": 19
+        },
+        {
+          "digest": "sha256:c27162e33c086142a6c6c23ca36ec6275afca4a2502c2fc7f6d99d3cf6cf8348",
+          "mode": "0644",
+          "path": "gemini-extension.json",
+          "size": 149
+        },
+        {
+          "digest": "sha256:9369eafc782a998103f04f191732b2c5fb209bca90e7f9a36efd812d7b1c704a",
+          "mode": "0644",
+          "path": "hooks/hooks.json",
+          "size": 185
+        }
+      ],
+      "id": "skill:gemini-cli:extensions/ext1",
+      "path": ".gemini/extensions/ext1",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "user"
+}
+--- problems ---

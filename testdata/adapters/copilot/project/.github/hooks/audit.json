@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "./scripts/audit.sh",
+        "powershell": "./scripts/audit.ps1",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+---
+globs: src/**/*.tsx
+---
+Use function components.

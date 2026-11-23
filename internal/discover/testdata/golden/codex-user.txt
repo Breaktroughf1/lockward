@@ -1,0 +1,41 @@
+{
+  "entries": [
+    {
+      "agent": "codex",
+      "digest": "sha256:de6829698ce247b198e69d6ce17c9481d6fd764e5b96760df12d5b46f2e7b8bf",
+      "id": "mcp:codex:git",
+      "path": ".codex/config.toml#/mcp_servers/git",
+      "server": {
+        "args": [
+          "mcp-server-git==0.6.2"
+        ],
+        "command": "uvx",
+        "package": {
+          "ecosystem": "pypi",
+          "name": "mcp-server-git",
+          "spec": "mcp-server-git==0.6.2",
+          "version": "0.6.2"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "mcp-server-git",
+        "resolved": "mcp-server-git==0.6.2",
+        "type": "pypi"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "codex",
+      "digest": "sha256:d9f6853733e4997b0f6d45584749530272def752ef4956f2cb181e6c4c6c7e84",
+      "id": "rules:codex:.codex/AGENTS.md",
+      "path": ".codex/AGENTS.md",
+      "surface": "rules"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "user"
+}
+--- problems ---

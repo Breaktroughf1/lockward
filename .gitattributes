@@ -1,0 +1,4 @@
+# Test fixtures and golden files are hashed byte-for-byte: never convert line endings.
+testdata/** -text
+**/testdata/** -text
+*.go text eol=lf

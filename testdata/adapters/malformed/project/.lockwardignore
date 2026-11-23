@@ -1,0 +1,3 @@
+# hide build output
+*.log
+.claude/skills/big/cache/

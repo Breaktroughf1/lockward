@@ -1,0 +1,12 @@
+{
+  "name": "ext1",
+  "version": "1.0.0",
+  "mcpServers": {
+    "x": {
+      "command": "npx",
+      "args": [
+        "ext-mcp"
+      ]
+    }
+  }
+}

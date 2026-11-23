@@ -1,0 +1,30 @@
+{
+  "numStartups": 42,
+  "tipsHistory": {
+    "x": 1
+  },
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory@0.6.0"
+      ]
+    }
+  },
+  "projects": {
+    "/home/dev/proj": {
+      "mcpServers": {
+        "db": {
+          "command": "docker",
+          "args": [
+            "run",
+            "-i",
+            "--rm",
+            "postgres-mcp:latest"
+          ]
+        }
+      }
+    }
+  }
+}

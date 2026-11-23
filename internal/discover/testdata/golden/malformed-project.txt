@@ -1,0 +1,99 @@
+{
+  "entries": [
+    {
+      "agent": "claude-code",
+      "digest": "sha256:17dae03ee1b6c6dc4b78094843191486084cd4fddecce162490940cd810aaac9",
+      "id": "mcp:claude-code:ok",
+      "loaded_by": [
+        "claude-code",
+        "copilot"
+      ],
+      "path": ".mcp.json#/mcpServers/ok",
+      "server": {
+        "command": "echo",
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "echo",
+        "type": "local"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:e2bf0651282067cca90d216968d69d38e3aeb1e23f1f75a4671700a937abcf1b",
+      "id": "mcp:cursor:.cursor/mcp.json",
+      "path": ".cursor/mcp.json",
+      "surface": "mcp"
+    },
+    {
+      "agent": "codex",
+      "digest": "sha256:7a45a181a854f97af3d230b3115783c2720c3270080c75e278eb7cf43e11ccf7",
+      "id": "settings:codex:.codex/config.toml",
+      "path": ".codex/config.toml",
+      "surface": "settings"
+    },
+    {
+      "agent": "generic",
+      "digest": "sha256:01cc7c2ea2baffc151d5271f07cc087c85deccb38936181461a497909f1d5349",
+      "id": "settings:generic:.lockwardignore",
+      "path": ".lockwardignore",
+      "settings": {
+        "patterns": [
+          "*.log",
+          ".claude/skills/big/cache/"
+        ]
+      },
+      "surface": "settings"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:c0284ab69f58c399d33d87ff3dd96871cf157d1d873599ff97d5d08f29eb4f21",
+      "files": [
+        {
+          "digest": "sha256:45b5805783120afa6cc0c6365e0a851624103945fc186a8378257788ecca2560",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 11
+        }
+      ],
+      "id": "skill:claude-code:big",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "cursor"
+      ],
+      "path": ".claude/skills/big",
+      "surface": "skill"
+    },
+    {
+      "agent": "claude-code",
+      "digest": "sha256:6383bc5d8676ea91fecad495bd5225982d849fef75f1f7dac9a91b1584aaa924",
+      "files": [
+        {
+          "digest": "sha256:753059f4cfb21adfd6077e0bb8f1af4727883520c65874cea4eda2bf354df966",
+          "mode": "0644",
+          "path": "loose.md",
+          "size": 38
+        }
+      ],
+      "id": "skill:claude-code:loose.md",
+      "loaded_by": [
+        "claude-code",
+        "copilot",
+        "cursor"
+      ],
+      "path": ".claude/skills/loose.md",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "project"
+}
+--- problems ---
+claude-code: .claude/settings.json#/hooks/PreToolUse: hook event value is not an array; skipped
+codex: .codex/config.toml: parse TOML: toml: expected '=' after key; pinned as raw bytes
+cursor: .cursor/mcp.json: parse JSON: unexpected EOF; pinned as raw bytes
+claude-code: .mcp.json#/mcpServers/bad: MCP server definition is not an object; skipped

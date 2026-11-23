@@ -1,0 +1,32 @@
+{
+  "entries": [
+    {
+      "agent": "generic",
+      "digest": "sha256:bb6fbb23f84820f006a0ef7cfb1bddd00a26a161b43906c65af88174b6cd9995",
+      "files": [
+        {
+          "digest": "sha256:81e2910ee16a0243c44326bb70a7d3ef3c1da8333891a77eb54f7862340305d1",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 19
+        }
+      ],
+      "id": "skill:generic:u",
+      "loaded_by": [
+        "codex",
+        "copilot",
+        "cursor",
+        "gemini-cli",
+        "generic",
+        "windsurf"
+      ],
+      "path": ".agents/skills/u",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "user"
+}
+--- problems ---

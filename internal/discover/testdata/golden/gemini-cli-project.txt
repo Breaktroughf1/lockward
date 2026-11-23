@@ -1,0 +1,118 @@
+{
+  "entries": [
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:3f2e2da3d976b752ff77910ee79f236a2050cdde97c13eda8e10e95f77907f42",
+      "hook": {
+        "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/security.sh",
+        "event": "BeforeTool",
+        "matcher": "write_file",
+        "type": "command"
+      },
+      "id": "hook:gemini-cli:.gemini/settings.json#BeforeTool/0/0",
+      "path": ".gemini/settings.json#/hooks/BeforeTool/0/hooks/0",
+      "referenced_files": [
+        {
+          "digest": "sha256:306c6ca7407560340797866e077e053627ad409277d1b9da58106fce4cf717cb",
+          "path": ".gemini/hooks/security.sh"
+        }
+      ],
+      "surface": "hook"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:ee5eb5c23c5586f4239b9df016195597bca39b15fbbb5557d4106f3c7ff232eb",
+      "id": "mcp:gemini-cli:local",
+      "path": ".gemini/settings.json#/mcpServers/local",
+      "server": {
+        "args": [
+          "server.js"
+        ],
+        "command": "node",
+        "transport": "stdio",
+        "trust": true
+      },
+      "source": {
+        "ref": "node",
+        "type": "local"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:c51260b0af05502a7d10f96bac29ccbfd6129baf3e68d3183b8443e665535b75",
+      "id": "mcp:gemini-cli:remote",
+      "path": ".gemini/settings.json#/mcpServers/remote",
+      "server": {
+        "transport": "sse",
+        "url": "https://sse.example.com/sse"
+      },
+      "source": {
+        "ref": "sse.example.com",
+        "type": "url"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:c43bfd90caf5519afd83bebe5cf77cf9009af7cad2be0634b29b1b6454b5b0ed",
+      "id": "rules:gemini-cli:.gemini/commands/git/commit.toml",
+      "path": ".gemini/commands/git/commit.toml",
+      "surface": "rules"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:bf1278f5151bd77e1092465e8ccd10424d4a13f5068b32e49c8ff338d7af5f0f",
+      "id": "rules:gemini-cli:GEMINI.md",
+      "path": "GEMINI.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:7335922cdf49e4b35fb9555e6b8df18aa991c9c0fd5db54e8b9c2aaeee727dd8",
+      "id": "rules:gemini-cli:docs/CONTEXT.md",
+      "path": "docs/CONTEXT.md",
+      "surface": "rules"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:5689d1c6e03a1ffe5e761fdc8e8cbdf78f3905d2d3dcf2e242e6f7e280de0e22",
+      "id": "settings:gemini-cli:.gemini/settings.json",
+      "path": ".gemini/settings.json",
+      "settings": {
+        "context": {
+          "fileName": [
+            "CONTEXT.md",
+            "GEMINI.md"
+          ]
+        },
+        "tools": {
+          "allowed": [
+            "run_shell_command"
+          ]
+        }
+      },
+      "surface": "settings"
+    },
+    {
+      "agent": "gemini-cli",
+      "digest": "sha256:04f4e0cf9d9ed04aaf6d17a5a87188aad2426cf2ceae9f4f7765e809575c1041",
+      "files": [
+        {
+          "digest": "sha256:188c4007e3449d43c8b12225e5d786feb1d1b9766ad9375b34d11294ab33d24a",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 21
+        }
+      ],
+      "id": "skill:gemini-cli:g1",
+      "path": ".gemini/skills/g1",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "project"
+}
+--- problems ---

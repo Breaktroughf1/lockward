@@ -1,0 +1,18 @@
+approval_policy = "never"
+project_doc_fallback_filenames = ["TEAM_GUIDE.md"]
+
+[mcp_servers.docs]
+command = "npx"
+args = ["-y", "docs-mcp@1.2.3"]
+
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+bearer_token_env_var = "FIGMA_OAUTH_TOKEN"
+default_tools_approval_mode = "approve"
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "python3 scripts/check.py"

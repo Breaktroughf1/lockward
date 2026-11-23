@@ -1,0 +1,119 @@
+{
+  "entries": [
+    {
+      "agent": "cursor",
+      "digest": "sha256:8a53ba374814c608e8aed86ac96cc6192efb4d08f2dce85422d46aeb1e450f55",
+      "hook": {
+        "command": ".cursor/hooks/audit.sh",
+        "event": "beforeShellExecution",
+        "matcher": "curl|wget"
+      },
+      "id": "hook:cursor:.cursor/hooks.json#beforeShellExecution/0",
+      "path": ".cursor/hooks.json#/hooks/beforeShellExecution/0",
+      "referenced_files": [
+        {
+          "digest": "sha256:306c6ca7407560340797866e077e053627ad409277d1b9da58106fce4cf717cb",
+          "path": ".cursor/hooks/audit.sh"
+        }
+      ],
+      "surface": "hook"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:a764c30485e5c46949dc96d3c87dd9c128c8bf7487de6d57cecbbcb9a3be7da5",
+      "id": "mcp:cursor:gh",
+      "path": ".cursor/mcp.json#/mcpServers/gh",
+      "server": {
+        "args": [
+          "-y",
+          "gh-mcp",
+          "--api-key",
+          "[REDACTED]"
+        ],
+        "command": "npx",
+        "env_keys": [
+          "GITHUB_TOKEN"
+        ],
+        "package": {
+          "ecosystem": "npm",
+          "name": "gh-mcp",
+          "spec": "gh-mcp"
+        },
+        "transport": "stdio"
+      },
+      "source": {
+        "ref": "gh-mcp",
+        "resolved": "gh-mcp",
+        "type": "npm"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:25c970475da8a4814d6193bb74da993b89de0b99456e6b168b47d7ec919d17b5",
+      "id": "mcp:cursor:remote",
+      "path": ".cursor/mcp.json#/mcpServers/remote",
+      "server": {
+        "header_keys": [
+          "X-API-Key"
+        ],
+        "transport": "http",
+        "url": "https://mcp.example.com/mcp"
+      },
+      "source": {
+        "ref": "mcp.example.com",
+        "type": "url"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:6a51b712b4b9d28147b1a22dcb3699f8868e825f7151a8815e71679b0cfc5ebe",
+      "id": "rules:cursor:.cursor/rules/frontend/components.mdc",
+      "path": ".cursor/rules/frontend/components.mdc",
+      "surface": "rules"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:830fb76bf1e0fd6f22e1a1d0fe813d387bf3bc601587d08204f107a1c0b48d65",
+      "id": "rules:cursor:.cursorrules",
+      "path": ".cursorrules",
+      "surface": "rules"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:b45372402b86f2774520198cb8ef313f43a4539745ae0e16d277fb6dcf4c0de0",
+      "files": [
+        {
+          "digest": "sha256:77ae1ad96f8ae81d0604f43a583d7da205a86a6734c67912728f1624ebb5bfd7",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 29
+        }
+      ],
+      "id": "skill:cursor:legacy",
+      "path": ".codex/skills/legacy",
+      "surface": "skill"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:8bf376e8ffaaaabe605a3e14fc80b24746cf82650fff50b24ff74e890bc39ce6",
+      "files": [
+        {
+          "digest": "sha256:84b30c28419bfca129a91217f4ae3493d83957b8e913fdef0d78950cb6306acb",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 21
+        }
+      ],
+      "id": "skill:cursor:s1",
+      "path": ".cursor/skills/s1",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "project"
+}
+--- problems ---

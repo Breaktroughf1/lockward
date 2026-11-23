@@ -1,0 +1,9 @@
+{
+  // Workspace MCP servers (JSONC: comments and trailing commas allowed)
+  "inputs": [{"type": "promptString", "id": "token", "description": "Token", "password": true}],
+  "servers": {
+    "playwright": {"type": "stdio", "command": "npx", "args": ["-y", "@playwright/mcp@latest"]},
+    /* remote server */
+    "api": {"type": "http", "url": "https://api.example.com/mcp", "headers": {"Authorization": "Bearer ${input:token}"}},
+  },
+}

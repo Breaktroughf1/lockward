@@ -1,0 +1,41 @@
+{
+  "mcpServers": {
+    "remote": {
+      "url": "https://sse.example.com/sse"
+    },
+    "local": {
+      "command": "node",
+      "args": [
+        "server.js"
+      ],
+      "trust": true
+    }
+  },
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/security.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "context": {
+    "fileName": [
+      "CONTEXT.md",
+      "GEMINI.md"
+    ]
+  },
+  "tools": {
+    "allowed": [
+      "run_shell_command"
+    ]
+  },
+  "ui": {
+    "theme": "dark"
+  }
+}

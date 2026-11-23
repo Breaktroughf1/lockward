@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github@2.1.0"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ]
+    },
+    "stripe": {
+      "type": "http",
+      "url": "https://mcp.stripe.com",
+      "headers": {
+        "Authorization": "Bearer ${STRIPE_KEY}"
+      }
+    },
+    "leaky": {
+      "command": "node",
+      "args": [
+        "server.js"
+      ],
+      "env": {
+        "API_KEY": "ghp_A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8"
+      }
+    }
+  }
+}

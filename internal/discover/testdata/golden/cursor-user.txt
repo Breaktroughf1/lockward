@@ -1,0 +1,56 @@
+{
+  "entries": [
+    {
+      "agent": "cursor",
+      "digest": "sha256:6ecd3416f54868c49a97feb7ab57b72f35cd86abfdc052b360fcedfb20dd6d21",
+      "hook": {
+        "command": "./hooks/format.sh",
+        "event": "afterFileEdit"
+      },
+      "id": "hook:cursor:.cursor/hooks.json#afterFileEdit/0",
+      "path": ".cursor/hooks.json#/hooks/afterFileEdit/0",
+      "referenced_files": [
+        {
+          "digest": "sha256:5cff9191d74912c07c997b387bef3b27524bf33c1d8d8a4128cb3e81ca47ca26",
+          "path": ".cursor/hooks/format.sh"
+        }
+      ],
+      "surface": "hook"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:cf0565883499b8cf2175162981a2545af547018a8ba945f1972357b7117e650c",
+      "id": "mcp:cursor:search",
+      "path": ".cursor/mcp.json#/mcpServers/search",
+      "server": {
+        "transport": "http",
+        "url": "https://search.example.com/sse?api_key=%5BREDACTED%5D&region=eu"
+      },
+      "source": {
+        "ref": "search.example.com",
+        "type": "url"
+      },
+      "surface": "mcp"
+    },
+    {
+      "agent": "cursor",
+      "digest": "sha256:6c14658e1616e3b95eeaa7a776404cbb4dcca2829a7a44c9241bec284ac34ac9",
+      "files": [
+        {
+          "digest": "sha256:402ed0ea9155d034d5fb46d1bc931ec99e5fd7d505db02e1aa2928f6f17a1855",
+          "mode": "0644",
+          "path": "SKILL.md",
+          "size": 21
+        }
+      ],
+      "id": "skill:cursor:u1",
+      "path": ".cursor/skills/u1",
+      "surface": "skill"
+    }
+  ],
+  "generated_by": "lockward test",
+  "hash_algorithm": "sha256",
+  "lockfile_version": 1,
+  "scope": "user"
+}
+--- problems ---
