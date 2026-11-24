@@ -2,10 +2,14 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.1] - 2026-11-24
 
 ### Added
 - `lockward init` also writes a `.gitattributes` that keeps agent files LF on every OS, so Windows checkouts (`core.autocrlf`) do not show drift against lockfiles created on Linux or macOS. An existing `.gitattributes` is never modified; `init` prints the lines to append.
+
+### Changed
+- The GitHub Action installs 0.1.1 by default.
+- The Action is now tested against the published release on Linux (x64 and arm64), macOS and Windows on every change.
 
 ### Fixed
 - Documentation recommended `text eol=lf` for directory globs, which makes Git rewrite line endings in binary files too; it now uses `text=auto eol=lf`.
@@ -27,4 +31,5 @@ First public release.
 - GitHub Action that verifies the release's Sigstore signature and checksum before running.
 - Reproducible release builds for Linux, macOS and Windows on amd64 and arm64, with a cosign-signed `checksums.txt` and SLSA build provenance.
 
+[0.1.1]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.1.0
