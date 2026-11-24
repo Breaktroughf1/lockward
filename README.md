@@ -1,5 +1,7 @@
 # Lockward
 
+[![CI](https://github.com/Breaktroughf1/lockward/actions/workflows/ci.yml/badge.svg)](https://github.com/Breaktroughf1/lockward/actions/workflows/ci.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Breaktroughf1/lockward/badge)](https://scorecard.dev/viewer/?uri=github.com/Breaktroughf1/lockward) [![Release](https://img.shields.io/github/v/release/Breaktroughf1/lockward)](https://github.com/Breaktroughf1/lockward/releases/latest)
+
 **A lockfile and policy gate for everything your AI coding agents load.**
 
 Lockward pins every skill, MCP server, hook, rules file and security-relevant setting used by Claude Code, Cursor, Codex, Gemini CLI, Windsurf and GitHub Copilot, then fails locally or in CI when anything changes without approval. It runs offline, needs no account, and has no LLM in the loop.
