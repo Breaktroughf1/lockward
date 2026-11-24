@@ -91,7 +91,9 @@ func tooLarge(n, m int) bool {
 
 func middle(a, b []string) []Op {
 	n, m := len(a), len(b)
-	if n == 0 || m == 0 || tooLarge(n, m) {
+	// The explicit n and m bounds make the allocation below visibly safe
+	// to static analysis; tooLarge is the exact limit.
+	if n == 0 || m == 0 || n >= maxCells || m >= maxCells || tooLarge(n, m) {
 		var ops []Op
 		for _, s := range a {
 			ops = append(ops, Op{Delete, s})
