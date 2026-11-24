@@ -99,3 +99,27 @@ jobs:
         env:
           CODE: ${{ steps.lockward.outputs.exit-code }}
         run: test "$CODE" = "0"
+
+  marketplace:
+    name: Marketplace repo (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run Breaktroughf1/lockward-action as a Marketplace user would
+        id: lockward
+        uses: Breaktroughf1/lockward-action@126b1debbad46a5ccf2b249f540b1b4993eab153 # v0.2.0
+        with:
+          version: ${{ inputs.version || '0.2.0' }}
+          args: verify --frozen --scope project
+          sarif: "false"
+      - name: Expect a clean result
+        shell: bash
+        env:
+          CODE: ${{ steps.lockward.outputs.exit-code }}
+        run: test "$CODE" = "0"
