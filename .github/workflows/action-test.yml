@@ -16,7 +16,7 @@ on:
       version:
         description: Lockward release to test
         required: false
-        default: "0.1.0"
+        default: "0.1.1"
 
 permissions:
   contents: read
@@ -40,7 +40,7 @@ jobs:
         id: lockward
         uses: ./action
         with:
-          version: ${{ inputs.version || '0.1.0' }}
+          version: ${{ inputs.version || '0.1.1' }}
           args: verify --frozen --scope project
           # Upload SARIF from one runner only to keep code scanning tidy.
           sarif: ${{ matrix.os == 'ubuntu-latest' }}
@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "exit-code=$CODE"
           test "$CODE" = "0"
-          lockward version | grep -q "lockward ${{ inputs.version || '0.1.0' }}"
+          lockward version | grep -q "lockward ${{ inputs.version || '0.1.1' }}"
 
   tampered:
     name: tampered repo fails with drift
@@ -67,7 +67,7 @@ jobs:
         continue-on-error: true
         uses: ./action
         with:
-          version: ${{ inputs.version || '0.1.0' }}
+          version: ${{ inputs.version || '0.1.1' }}
           args: verify --frozen --scope project
           sarif: "false"
       - name: Expect drift (exit code 1) and a failed step
@@ -89,9 +89,9 @@ jobs:
           persist-credentials: false
       - name: Run the action as an external consumer would
         id: lockward
-        uses: Breaktroughf1/lockward/action@126c1d4462674b09c4e3902f0f708fa518b74edf # v0.1.0
+        uses: Breaktroughf1/lockward/action@3bc57458456185a6f5954253caf333a6e9218e8f # v0.1.1
         with:
-          version: "0.1.0"
+          version: "0.1.1"
           args: status --scope project
           sarif: "false"
       - name: Expect a clean result
