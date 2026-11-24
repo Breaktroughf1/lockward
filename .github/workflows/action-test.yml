@@ -16,7 +16,7 @@ on:
       version:
         description: Lockward release to test
         required: false
-        default: "0.2.0"
+        default: "0.2.1"
 
 permissions:
   contents: read
@@ -40,7 +40,7 @@ jobs:
         id: lockward
         uses: ./action
         with:
-          version: ${{ inputs.version || '0.2.0' }}
+          version: ${{ inputs.version || '0.2.1' }}
           args: verify --frozen --scope project
           # Upload SARIF from one runner only to keep code scanning tidy.
           sarif: ${{ matrix.os == 'ubuntu-latest' }}
@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "exit-code=$CODE"
           test "$CODE" = "0"
-          lockward version | grep -q "lockward ${{ inputs.version || '0.2.0' }}"
+          lockward version | grep -q "lockward ${{ inputs.version || '0.2.1' }}"
 
   tampered:
     name: tampered repo fails with drift
@@ -67,7 +67,7 @@ jobs:
         continue-on-error: true
         uses: ./action
         with:
-          version: ${{ inputs.version || '0.2.0' }}
+          version: ${{ inputs.version || '0.2.1' }}
           args: verify --frozen --scope project
           sarif: "false"
       - name: Expect drift (exit code 1) and a failed step
@@ -89,9 +89,9 @@ jobs:
           persist-credentials: false
       - name: Run the action as an external consumer would
         id: lockward
-        uses: Breaktroughf1/lockward/action@5d05586fab10e7ba575383a6a4f05cacbdc096d7 # v0.2.0
+        uses: Breaktroughf1/lockward/action@8ed8789266de46e1a7685a8c8ee01994e563cf4c # v0.2.1
         with:
-          version: "0.2.0"
+          version: "0.2.1"
           args: status --scope project
           sarif: "false"
       - name: Expect a clean result
@@ -113,9 +113,9 @@ jobs:
           persist-credentials: false
       - name: Run Breaktroughf1/lockward-action as a Marketplace user would
         id: lockward
-        uses: Breaktroughf1/lockward-action@bfbb98e7ac97a8ebe8361dab2d36dd4523ca1c1b # v0.2.0
+        uses: Breaktroughf1/lockward-action@9cd459395337f898d6687000e50a5b2a15b44f1c # v0.2.1
         with:
-          version: ${{ inputs.version || '0.2.0' }}
+          version: ${{ inputs.version || '0.2.1' }}
           args: verify --frozen --scope project
           sarif: "false"
       - name: Expect a clean result

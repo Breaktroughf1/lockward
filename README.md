@@ -63,9 +63,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@<sha>
-      - uses: Breaktroughf1/lockward-action@bfbb98e7ac97a8ebe8361dab2d36dd4523ca1c1b # v0.2.0
+      - uses: Breaktroughf1/lockward-action@9cd459395337f898d6687000e50a5b2a15b44f1c # v0.2.1
         with:
-          version: 0.2.0
+          version: 0.2.1
           args: verify --frozen
 ```
 
