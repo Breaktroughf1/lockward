@@ -17,9 +17,9 @@ jobs:
       - uses: actions/checkout@<sha>
         with:
           persist-credentials: false
-      - uses: Breaktroughf1/lockward-action@9cd459395337f898d6687000e50a5b2a15b44f1c # v0.2.1
+      - uses: Breaktroughf1/lockward-action@5f263faef294df8df5c4805aa7a5d9748ec32112 # v0.2.2
         with:
-          version: 0.2.1
+          version: 0.2.2
 ```
 
 ## Inputs
