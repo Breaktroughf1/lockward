@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/Breaktroughf1/lockward/internal/exitcode"
+	"github.com/Breaktroughf1/lockward/internal/report"
 )
 
 func main() {
@@ -44,7 +45,7 @@ func runContext(ctx context.Context, args []string, stdout, stderr io.Writer) in
 	}
 	cmd, ok := lookup(name)
 	if !ok {
-		fmt.Fprintf(stderr, "lockward: unknown command %q\nRun 'lockward help' for usage.\n", name)
+		fmt.Fprintf(stderr, "lockward: unknown command %q\nRun 'lockward help' for usage.\n", name) // %q escapes control characters
 		return int(exitcode.Usage)
 	}
 	return runCommand(ctx, cmd, rest, stdout, stderr)
@@ -66,7 +67,7 @@ func runCommand(ctx context.Context, cmd *command, args []string, stdout, stderr
 	code := exitcode.From(err)
 	var ec *exitcode.Error
 	if err != nil && (!errors.As(err, &ec) || ec.Err != nil) {
-		fmt.Fprintf(stderr, "lockward %s: %v\n", cmd.name, err)
+		fmt.Fprintf(stderr, "lockward %s: %s\n", cmd.name, report.Safe(err.Error()))
 		if code == exitcode.Usage {
 			fmt.Fprintf(stderr, "Run 'lockward %s -h' for usage.\n", cmd.name)
 		}

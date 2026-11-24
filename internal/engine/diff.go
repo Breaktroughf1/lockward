@@ -13,6 +13,7 @@ import (
 	"github.com/Breaktroughf1/lockward/internal/hash"
 	"github.com/Breaktroughf1/lockward/internal/lock"
 	"github.com/Breaktroughf1/lockward/internal/prose"
+	"github.com/Breaktroughf1/lockward/internal/report"
 	"github.com/Breaktroughf1/lockward/internal/snapshot"
 )
 
@@ -68,7 +69,9 @@ type differ struct {
 
 func (d *differ) line(indent int, format string, args ...any) {
 	d.b.WriteString(strings.Repeat("  ", indent))
-	fmt.Fprintf(&d.b, format, args...)
+	// File contents and recorded commands are untrusted: neutralise control
+	// and bidirectional characters before they reach a terminal.
+	d.b.WriteString(report.Safe(fmt.Sprintf(format, args...)))
 	d.b.WriteByte('\n')
 }
 

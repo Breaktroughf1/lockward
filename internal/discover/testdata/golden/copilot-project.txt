@@ -2,10 +2,13 @@
   "entries": [
     {
       "agent": "copilot",
-      "digest": "sha256:01d2ec86193c7fdc5ba71ea5a7b76d1704cdc175a718c63b9cdab7d7d6147711",
+      "digest": "sha256:10f32cdad64f0e47a9b5e26630a94ce40caec8f7e1c4f0506efd83cce3f9ff66",
       "hook": {
         "bash": "./scripts/audit.sh",
         "event": "preToolUse",
+        "options": {
+          "timeoutSec": 10
+        },
         "powershell": "./scripts/audit.ps1",
         "type": "command"
       },

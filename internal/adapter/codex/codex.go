@@ -86,6 +86,7 @@ func config(src *adapter.Source, r *adapter.Result, file string) map[string]any 
 	}))
 	r.Add(adapter.Settings(m, adapter.SettingsOptions{
 		Agent: name, LoadedBy: self, File: file, Keys: settingsKeys, AutoApprove: autoApprove,
+		All: src.Scope == asset.ScopeProject, Exclude: []string{"mcp_servers", "hooks"},
 	}))
 	return m
 }

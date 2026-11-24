@@ -76,7 +76,7 @@
     },
     {
       "agent": "gemini-cli",
-      "digest": "sha256:5689d1c6e03a1ffe5e761fdc8e8cbdf78f3905d2d3dcf2e242e6f7e280de0e22",
+      "digest": "sha256:29cddb39421b6ff2a64043256ba98fbe06d30b9e6062b65921dc72d8eaccd9ee",
       "id": "settings:gemini-cli:.gemini/settings.json",
       "path": ".gemini/settings.json",
       "settings": {
@@ -90,6 +90,9 @@
           "allowed": [
             "run_shell_command"
           ]
+        },
+        "ui": {
+          "theme": "dark"
         }
       },
       "surface": "settings"

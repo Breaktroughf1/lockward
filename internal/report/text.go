@@ -33,25 +33,25 @@ func Text(w io.Writer, r *Report, o TextOptions) error {
 		if i > 0 {
 			b.WriteString("\n")
 		}
-		fmt.Fprintf(&b, "%s%s scope%s (%s)\n", p.bold, s.Scope, p.reset, s.Lockfile)
+		fmt.Fprintf(&b, "%s%s scope%s (%s)\n", p.bold, s.Scope, p.reset, Safe(s.Lockfile))
 		if s.PolicyFile != "" {
-			fmt.Fprintf(&b, "  policy: %s (%s)\n", s.PolicyFile, short(s.PolicyDigest))
+			fmt.Fprintf(&b, "  policy: %s (%s)\n", Safe(s.PolicyFile), short(s.PolicyDigest))
 		} else {
 			b.WriteString("  policy: built-in defaults (run 'lockward init' to create lockward.policy.yaml)\n")
 		}
 		if len(s.IgnorePatterns) > 0 {
 			fmt.Fprintf(&b, "  ignore: .lockwardignore has %d pattern(s): %s; %d file(s) inside pinned skills ignored\n",
-				len(s.IgnorePatterns), strings.Join(s.IgnorePatterns, ", "), s.Ignored)
+				len(s.IgnorePatterns), Safe(strings.Join(s.IgnorePatterns, ", ")), s.Ignored)
 		}
 		for _, n := range s.Notices {
-			fmt.Fprintf(&b, "  note: %s\n", n)
+			fmt.Fprintf(&b, "  note: %s\n", Safe(n))
 		}
 		writeResults(&b, s, r.Frozen, o, p)
 		writeFindings(&b, s, p)
 		if len(s.Problems) > 0 {
 			b.WriteString("\n  problems (pinned or skipped as noted; review them):\n")
 			for _, pr := range s.Problems {
-				fmt.Fprintf(&b, "    %s%s%s\n", p.yellow, pr.String(), p.reset)
+				fmt.Fprintf(&b, "    %s%s%s\n", p.yellow, Safe(pr.String()), p.reset)
 			}
 		}
 	}
@@ -105,8 +105,8 @@ func writeResults(b *strings.Builder, s Scope, frozen bool, o TextOptions, p pal
 			color = p.yellow
 		}
 		e := res.Entry()
-		q := ShellQuote(res.ID)
-		fmt.Fprintf(b, "  %s%-8s%s  %s  %s%s%s\n", color, res.Status, p.reset, res.ID, p.dim, e.Path, p.reset)
+		q := Safe(ShellQuote(res.ID))
+		fmt.Fprintf(b, "  %s%-8s%s  %s  %s%s%s\n", color, res.Status, p.reset, Safe(res.ID), p.dim, Safe(e.Path), p.reset)
 		switch res.Status {
 		case lock.StatusModified:
 			fmt.Fprintf(b, "            review: lockward diff%s %s\n", scopeFlag, q)
@@ -133,10 +133,10 @@ func writeFindings(b *strings.Builder, s Scope, p palette) {
 		if f.Line > 0 {
 			loc = fmt.Sprintf("%s:%d", f.Path, f.Line)
 		}
-		fmt.Fprintf(b, "  %s%-7s%s %s %s  %s\n", color, f.Severity, p.reset, f.Rule, f.Name, f.EntryID)
-		fmt.Fprintf(b, "          %s\n", f.Message)
+		fmt.Fprintf(b, "  %s%-7s%s %s %s  %s\n", color, f.Severity, p.reset, f.Rule, f.Name, Safe(f.EntryID))
+		fmt.Fprintf(b, "          %s\n", Safe(f.Message))
 		if loc != "" {
-			fmt.Fprintf(b, "          at %s\n", loc)
+			fmt.Fprintf(b, "          at %s\n", Safe(loc))
 		}
 		fmt.Fprintf(b, "          fix: %s\n", f.Remediation)
 	}

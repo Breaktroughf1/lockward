@@ -29,6 +29,10 @@ var tokenPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`-----BEGIN [A-Z ]*PRIVATE KEY-----`),
 }
 
+// headerPattern masks "Name: value" header pairs whose name holds a secret,
+// as in curl -H "X-Api-Key: abc123" or --header "Authorization: token".
+var headerPattern = regexp.MustCompile(`(?i)\b([A-Za-z0-9-]*(?:api[-_]?key|token|secret|password|auth[A-Za-z-]*|cookie|session)[A-Za-z0-9-]*\s*:\s*)([^\s"'$][^\s"']{3,})`)
+
 // bearerPattern keeps the scheme word and masks the credential.
 var bearerPattern = regexp.MustCompile(`(?i)\b(bearer|basic|token)\s+[A-Za-z0-9._~+/=-]{12,}`)
 
@@ -59,7 +63,18 @@ func String(s string) string {
 	for _, re := range tokenPatterns {
 		s = re.ReplaceAllString(s, Mask)
 	}
-	return bearerPattern.ReplaceAllString(s, "$1 "+Mask)
+	s = bearerPattern.ReplaceAllString(s, "$1 "+Mask)
+	return headerPattern.ReplaceAllStringFunc(s, func(m string) string {
+		sub := headerPattern.FindStringSubmatch(m)
+		switch strings.ToLower(sub[2]) {
+		case "bearer", "basic", "token", "digest", "negotiate": // scheme word; bearerPattern masks the credential
+			return m
+		}
+		if sub[2] == Mask || strings.HasPrefix(sub[2], "[REDACTED") || IsReference(sub[2]) {
+			return m
+		}
+		return sub[1] + Mask
+	})
 }
 
 // IsReference reports whether a config value refers to a secret indirectly

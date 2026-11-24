@@ -18,9 +18,9 @@ func Text(w io.Writer, r *Result, color bool) error {
 		red, yellow, bold, reset = "\x1b[31m", "\x1b[33m", "\x1b[1m", "\x1b[0m"
 	}
 	var b strings.Builder
-	fmt.Fprintf(&b, "%sscan-repo%s %s (read-only; nothing was executed)\n", bold, reset, r.Root)
+	fmt.Fprintf(&b, "%sscan-repo%s %s (read-only; nothing was executed)\n", bold, reset, report.Safe(r.Root))
 	if r.PolicyFile != "" {
-		fmt.Fprintf(&b, "  policy: %s\n", r.PolicyFile)
+		fmt.Fprintf(&b, "  policy: %s\n", report.Safe(r.PolicyFile))
 	} else {
 		b.WriteString("  policy: built-in defaults\n")
 	}
@@ -47,15 +47,15 @@ func Text(w io.Writer, r *Result, color bool) error {
 		} else if it.Connects {
 			marker = yellow + "~ " + reset
 		}
-		fmt.Fprintf(&b, "\n%s%-8s %s\n", marker, it.Surface, it.Path)
-		fmt.Fprintf(&b, "           loaded by: %s\n", strings.Join(it.LoadedBy, ", "))
+		fmt.Fprintf(&b, "\n%s%-8s %s\n", marker, it.Surface, report.Safe(it.Path))
+		fmt.Fprintf(&b, "           loaded by: %s\n", report.Safe(strings.Join(it.LoadedBy, ", ")))
 		if it.Executes != "" {
-			fmt.Fprintf(&b, "           %s\n", it.Executes)
+			fmt.Fprintf(&b, "           %s\n", report.Safe(it.Executes))
 		} else if it.Surface == asset.SurfaceRules || it.Surface == asset.SurfaceSkill {
 			b.WriteString("           instructions the agent reads automatically\n")
 		}
 		if len(it.URLs) > 0 {
-			fmt.Fprintf(&b, "           references: %s\n", strings.Join(it.URLs, ", "))
+			fmt.Fprintf(&b, "           references: %s\n", report.Safe(strings.Join(it.URLs, ", ")))
 		}
 	}
 	if len(r.Findings) > 0 {
@@ -69,13 +69,13 @@ func Text(w io.Writer, r *Result, color bool) error {
 			if f.Line > 0 {
 				loc = fmt.Sprintf("%s:%d", f.Path, f.Line)
 			}
-			fmt.Fprintf(&b, "  %s%-7s%s %s %s  %s\n          %s\n          at %s\n", c, f.Severity, reset, f.Rule, f.Name, f.EntryID, f.Message, loc)
+			fmt.Fprintf(&b, "  %s%-7s%s %s %s  %s\n          %s\n          at %s\n", c, f.Severity, reset, f.Rule, f.Name, report.Safe(f.EntryID), report.Safe(f.Message), report.Safe(loc))
 		}
 	}
 	if len(r.Problems) > 0 {
 		b.WriteString("\nproblems:\n")
 		for _, p := range r.Problems {
-			fmt.Fprintf(&b, "  %s\n", p.String())
+			fmt.Fprintf(&b, "  %s\n", report.Safe(p.String()))
 		}
 	}
 	errs, warns := 0, 0

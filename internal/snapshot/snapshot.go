@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/Breaktroughf1/lockward/internal/hash"
@@ -67,6 +68,15 @@ func (s *Store) Put(b []byte) (bool, error) {
 		return false, fmt.Errorf("snapshot: %w", err)
 	}
 	return true, nil
+}
+
+// sensitiveNames match files that commonly hold credentials. Their content
+// is never copied into the snapshot cache, even if it is text.
+var sensitiveNames = regexp.MustCompile(`(?i)^(\.env(\..*)?|.*\.(pem|key|p12|pfx|jks|keystore|kdbx|asc|gpg)|id_(rsa|dsa|ecdsa|ed25519)(\.pub)?|\.netrc|\.npmrc|\.pypirc|\.git-credentials|credentials(\.json)?|.*secret.*|.*token.*)$`)
+
+// Sensitive reports whether a file name looks like it holds credentials.
+func Sensitive(name string) bool {
+	return sensitiveNames.MatchString(filepath.Base(filepath.FromSlash(name)))
 }
 
 // Get returns the snapshot for digest, verified. ok is false if absent or if

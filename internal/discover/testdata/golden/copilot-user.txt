@@ -14,7 +14,7 @@
     },
     {
       "agent": "copilot",
-      "digest": "sha256:2b6090398f16bb437eeed485e8cb2d3c32375e798fa5b21742e32fc27ce6e83a",
+      "digest": "sha256:2e90affc61cd2f75b94d030c9e7d80e110a753d940ae0bb207d36a9c9ffe4df3",
       "id": "mcp:copilot:pw",
       "path": ".copilot/mcp-config.json#/mcpServers/pw",
       "server": {
@@ -23,6 +23,11 @@
           "@playwright/mcp@0.0.40"
         ],
         "command": "npx",
+        "options": {
+          "tools": [
+            "*"
+          ]
+        },
         "package": {
           "ecosystem": "npm",
           "name": "@playwright/mcp",

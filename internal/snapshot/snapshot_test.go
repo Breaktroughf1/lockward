@@ -66,3 +66,14 @@ func TestDefault(t *testing.T) {
 		t.Errorf("Default dir = %s", s.Dir)
 	}
 }
+
+func TestSensitive(t *testing.T) {
+	for name, want := range map[string]bool{
+		".env": true, ".env.local": true, "keys/server.pem": true, "id_ed25519": true, "aws/credentials": true,
+		"client_secret.json": true, "github-token.txt": true, "SKILL.md": false, "scripts/run.py": false, "README.md": false,
+	} {
+		if got := Sensitive(name); got != want {
+			t.Errorf("Sensitive(%q) = %v, want %v", name, got, want)
+		}
+	}
+}

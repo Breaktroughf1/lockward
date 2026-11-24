@@ -2,11 +2,14 @@
   "entries": [
     {
       "agent": "windsurf",
-      "digest": "sha256:a398be40c19d35a7eec1769c30e81dc247fc5fc1016cc4b87d48364c4a60ff31",
+      "digest": "sha256:9a3e7cd99a5d97307a531fc1f9b0157fa333368388d73134d32ba359f3f575d1",
       "hook": {
         "command": "./scripts/check-command.sh",
         "event": "PreToolUse",
         "matcher": "exec",
+        "options": {
+          "timeout": 10
+        },
         "type": "command"
       },
       "id": "hook:windsurf:.devin/hooks.v1.json#PreToolUse/0/0",

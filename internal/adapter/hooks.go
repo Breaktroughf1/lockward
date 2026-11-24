@@ -92,6 +92,7 @@ func hookAsset(o HookOptions, event, matcher string, m map[string]any, tokens []
 			}
 		}
 	}
+	h.Options = extras(m, hookFields)
 	return asset.Asset{
 		Surface:       asset.SurfaceHook,
 		Agent:         o.Agent,
@@ -104,6 +105,10 @@ func hookAsset(o HookOptions, event, matcher string, m map[string]any, tokens []
 		InlineSecrets: secrets,
 	}
 }
+
+// hookFields are the handler keys modelled by Hook fields; every other key
+// (including env and headers, reduced to names) is pinned in Options.
+var hookFields = []string{"type", "command", "bash", "powershell", "exec", "args", "shell", "cwd", "url", "prompt", "server", "tool", "matcher"}
 
 // scriptExts mark a bare token as a script path even without a slash.
 var scriptExts = []string{".sh", ".bash", ".zsh", ".py", ".js", ".mjs", ".cjs", ".ts", ".rb", ".pl", ".ps1", ".bat", ".cmd", ".php", ".lua"}

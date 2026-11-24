@@ -275,6 +275,9 @@ func storeSnapshots(c Config, live *Live, entries []asset.Entry) []string {
 	}
 	var failed int
 	put := func(p string) {
+		if snapshot.Sensitive(p) {
+			return // never copy credential-like files into the cache
+		}
 		info, err := fs.Stat(live.FS, p)
 		if err != nil || !info.Mode().IsRegular() || info.Size() > snapshot.MaxSize {
 			return

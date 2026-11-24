@@ -552,7 +552,7 @@ func runLock(e *env, o *locations, sel string) error {
 		if res.Created {
 			verb = "created"
 		}
-		fmt.Fprintf(e.stdout, "%s scope: %s %s with %d entries (%s)\n", c.Scope, verb, c.DisplayLockfile, len(res.Entries), surfaceCounts(res.Entries))
+		fmt.Fprintf(e.stdout, "%s scope: %s %s with %d entries (%s)\n", c.Scope, verb, report.Safe(c.DisplayLockfile), len(res.Entries), surfaceCounts(res.Entries))
 		if len(res.Changes) > 0 {
 			counts := lock.Counts(res.Changes)
 			fmt.Fprintf(e.stdout, "  changes since the previous lockfile: %d added, %d modified, %d removed (approvals kept only for unchanged entries)\n",
@@ -562,16 +562,38 @@ func runLock(e *env, o *locations, sel string) error {
 			fmt.Fprintf(e.stdout, "  ignore: %d pattern(s) from .lockwardignore; %d file(s) inside skills not pinned\n", len(res.Ignore), res.Ignored)
 		}
 		for _, n := range res.Notices {
-			fmt.Fprintf(e.stdout, "  note: %s\n", n)
+			fmt.Fprintf(e.stdout, "  note: %s\n", report.Safe(n))
 		}
 		for _, p := range res.Problems {
-			fmt.Fprintf(e.stdout, "  problem: %s\n", p)
+			fmt.Fprintf(e.stdout, "  problem: %s\n", report.Safe(p.String()))
+		}
+		if c.Scope == asset.ScopeProject {
+			for _, f := range personalFiles(res.Entries) {
+				fmt.Fprintf(e.stdout, "  note: pinned %s, a personal file that is usually not committed; CI will report it as removed. If it should not be shared, add it to .lockwardignore and lock again.\n", report.Safe(f))
+			}
 		}
 	}
 	if cfgs[0].Scope == asset.ScopeProject {
 		fmt.Fprintf(e.stdout, "Next: commit %s, then run 'lockward verify' (use --frozen in CI).\n", lock.ProjectFileName)
 	}
 	return nil
+}
+
+// personalFiles returns pinned project files that agents treat as personal
+// and that are normally gitignored (CLAUDE.local.md, settings.local.json...).
+func personalFiles(entries []asset.Entry) []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, e := range entries {
+		file, _, _ := strings.Cut(e.Path, "#")
+		base := filepath.Base(file)
+		if strings.Contains(base, ".local.") && !seen[file] {
+			seen[file] = true
+			out = append(out, file)
+		}
+	}
+	sort.Strings(out)
+	return out
 }
 
 func surfaceCounts(entries []asset.Entry) string {
@@ -678,12 +700,12 @@ func runDiff(e *env, o *locations, sel, id string) error {
 		}
 		known = true
 		for _, n := range notices {
-			fmt.Fprintf(e.stdout, "note: %s\n", n)
+			fmt.Fprintf(e.stdout, "note: %s\n", report.Safe(n))
 		}
 		for _, it := range items {
 			changed = true
 			ent := it.Result.Entry()
-			fmt.Fprintf(e.stdout, "%s  %s  %s\n%s", it.Result.Status, it.Result.ID, ent.Path, it.Body)
+			fmt.Fprintf(e.stdout, "%s  %s  %s\n%s", it.Result.Status, report.Safe(it.Result.ID), report.Safe(ent.Path), it.Body)
 		}
 	}
 	if id != "" && !known {
@@ -721,9 +743,9 @@ func runApprove(e *env, o *locations, sel string, ids []string, all bool, by str
 	if by != "" {
 		who = " as " + by
 	}
-	fmt.Fprintf(e.stdout, "approved %d entr%s in %s%s:\n", len(approved), plural(len(approved), "y", "ies"), c.DisplayLockfile, who)
+	fmt.Fprintf(e.stdout, "approved %d entr%s in %s%s:\n", len(approved), plural(len(approved), "y", "ies"), report.Safe(c.DisplayLockfile), report.Safe(who))
 	for _, id := range approved {
-		fmt.Fprintf(e.stdout, "  %s\n", id)
+		fmt.Fprintf(e.stdout, "  %s\n", report.Safe(id))
 	}
 	if by == "" {
 		fmt.Fprintln(e.stdout, "note: no approver identity found (set git user.email, LOCKWARD_APPROVER or --by); approved.by was not recorded")

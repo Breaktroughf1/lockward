@@ -62,6 +62,11 @@ func repoConfigs(root string) []string {
 	if !filepath.IsAbs(dir) {
 		dir = filepath.Join(root, dir)
 	}
+	// A hostile checkout could point gitdir anywhere; only follow it into a
+	// real git directory (".git", ".git/worktrees/x", ".git/modules/x").
+	if !isGitDir(dir) {
+		return nil
+	}
 	out := []string{filepath.Join(dir, "config.worktree")}
 	if c, err := os.ReadFile(filepath.Join(dir, "commondir")); err == nil { //nolint:gosec // inside the gitdir
 		common := strings.TrimSpace(string(c))
@@ -71,6 +76,15 @@ func repoConfigs(root string) []string {
 		out = append(out, filepath.Join(common, "config"))
 	}
 	return append(out, filepath.Join(dir, "config"))
+}
+
+func isGitDir(dir string) bool {
+	for _, part := range strings.Split(filepath.ToSlash(filepath.Clean(dir)), "/") {
+		if part == ".git" || strings.HasSuffix(part, ".git") {
+			return true
+		}
+	}
+	return false
 }
 
 // userEmail extracts user.email from a git config file (INI subset).

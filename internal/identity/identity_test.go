@@ -61,3 +61,14 @@ func TestWorktreeAndXDG(t *testing.T) {
 		t.Errorf("bad .git file = %q", got)
 	}
 }
+
+func TestGitdirOutsideGitDirIgnored(t *testing.T) {
+	t.Setenv(EnvApprover, "")
+	t.Setenv("XDG_CONFIG_HOME", "")
+	base := t.TempDir()
+	write(t, filepath.Join(base, "elsewhere", "config"), "[user]\nemail = leaked@example.com\n")
+	write(t, filepath.Join(base, "repo", ".git"), "gitdir: ../elsewhere\n")
+	if got := Approver(filepath.Join(base, "repo"), ""); got != "" {
+		t.Errorf("followed gitdir outside a git directory: %q", got)
+	}
+}

@@ -117,6 +117,10 @@ type MCPServer struct {
 	Trust        bool     `json:"trust,omitempty"`         // Gemini CLI: bypasses all confirmations
 	ApprovalMode string   `json:"approval_mode,omitempty"` // Codex default_tools_approval_mode
 	Disabled     bool     `json:"disabled,omitempty"`
+	// Options holds every other field of the server definition (redacted;
+	// env and header maps reduced to names), so a change to any field, such
+	// as a headersHelper command, is drift (SPEC §4.2).
+	Options map[string]any `json:"options,omitempty"`
 }
 
 // Hook is the recorded definition of one hook handler (SPEC §4.3).
@@ -135,6 +139,9 @@ type Hook struct {
 	Prompt     string   `json:"prompt,omitempty"`
 	Server     string   `json:"server,omitempty"`
 	Tool       string   `json:"tool,omitempty"`
+	// Options holds every other field of the handler (redacted; env and
+	// header maps reduced to names), e.g. an "if" condition (SPEC §4.3).
+	Options map[string]any `json:"options,omitempty"`
 }
 
 // Commands returns every command string the hook may execute.

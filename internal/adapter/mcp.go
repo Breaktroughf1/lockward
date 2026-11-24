@@ -159,7 +159,31 @@ func ParseServer(m map[string]any, d Dialect) (srv *asset.MCPServer, secrets, au
 	if srv.Transport == "stdio" {
 		srv.Package = DetectPackage(srv.Command, srv.Args)
 	}
+	srv.Options = extras(m, serverFields)
 	return srv, secrets, autoApprove
+}
+
+// serverFields are the server keys modelled by MCPServer fields; every other
+// key is pinned in Options.
+var serverFields = []string{
+	"command", "args", "cwd", "httpUrl", "url", "serverUrl", "env", "headers", "http_headers",
+	"type", "transport", "disabled", "enabled", "trust", "default_tools_approval_mode",
+	"env_http_headers", "env_vars", "bearer_token_env_var", "bearer_token",
+}
+
+// extras returns the redacted values of every key of m not in known, or nil.
+func extras(m map[string]any, known []string) map[string]any {
+	var out map[string]any
+	for _, k := range SortedKeys(m) {
+		if contains(known, k) {
+			continue
+		}
+		if out == nil {
+			out = map[string]any{}
+		}
+		out[k] = scrub(k, m[k], 0)
+	}
+	return out
 }
 
 func firstString(m map[string]any, keys ...string) (val, key string) {

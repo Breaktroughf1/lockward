@@ -106,3 +106,21 @@ func FuzzRedactNeverLeaksToken(f *testing.F) {
 		}
 	})
 }
+
+func TestHeaderStyleSecrets(t *testing.T) {
+	for in, want := range map[string]string{
+		`curl -H "X-Api-Key: abc123def" https://x`: `curl -H "X-Api-Key: [REDACTED]" https://x`,
+		`--header Authorization:sometoken123`:      `--header Authorization:[REDACTED]`,
+		`curl -H "X-Api-Key: ${API_KEY}"`:          `curl -H "X-Api-Key: ${API_KEY}"`,
+		`curl -H "Content-Type: application/json"`: `curl -H "Content-Type: application/json"`,
+		`https://example.com:8443/path`:            `https://example.com:8443/path`,
+	} {
+		if got := String(in); got != want {
+			t.Errorf("String(%q) = %q, want %q", in, got, want)
+		}
+	}
+	out, masked := Args([]string{"--header", "X-Auth-Token: s3cr3tvalue"})
+	if out[1] != "X-Auth-Token: "+Mask || len(masked) != 1 {
+		t.Errorf("Args header = %q %v", out, masked)
+	}
+}

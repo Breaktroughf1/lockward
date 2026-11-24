@@ -84,6 +84,7 @@ func configFile(src *adapter.Source, file string) adapter.Result {
 	}))
 	r.Add(adapter.Settings(m, adapter.SettingsOptions{
 		Agent: name, LoadedBy: self, File: file, Keys: []string{"permissions"}, AutoApprove: autoApprove,
+		All: src.Scope == asset.ScopeProject, Exclude: []string{"mcpServers", "hooks"},
 	}))
 	return r
 }

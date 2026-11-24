@@ -112,6 +112,10 @@ type SettingsOptions struct {
 	// Keys are top-level or dotted keys to keep. A key ending in "*" keeps
 	// every top-level key with that prefix (VS Code style flat keys).
 	Keys []string
+	// All pins every top-level key except Exclude (used for project-scope
+	// config files, which are committed and reviewed, so any change matters).
+	All     bool
+	Exclude []string
 	// AutoApprove computes human-readable auto-approval findings (LW008).
 	AutoApprove func(m map[string]any) []string
 }
@@ -121,6 +125,13 @@ type SettingsOptions struct {
 // object under an "env" key is reduced to its sorted key names.
 func Settings(m map[string]any, o SettingsOptions) Result {
 	sub := map[string]any{}
+	if o.All {
+		for _, k := range SortedKeys(m) {
+			if !contains(o.Exclude, k) {
+				sub[k] = scrub(k, m[k], 0)
+			}
+		}
+	}
 	for _, k := range o.Keys {
 		if prefix, ok := strings.CutSuffix(k, "*"); ok {
 			for _, key := range SortedKeys(m) {
@@ -147,6 +158,17 @@ func Settings(m map[string]any, o SettingsOptions) Result {
 	return Result{Assets: []asset.Asset{a}}
 }
 
+// nameOnly reports keys whose object values are reduced to their key names:
+// environment variables and HTTP headers (values never stored, SPEC §4.2).
+func nameOnly(key string) bool {
+	base := strings.ToLower(path.Base(strings.ReplaceAll(key, ".", "/")))
+	switch base {
+	case "env", "headers", "http_headers", "env_http_headers", "environment":
+		return true
+	}
+	return false
+}
+
 func scrub(key string, v any, depth int) any {
 	if depth > 64 {
 		return nil
@@ -164,7 +186,7 @@ func scrub(key string, v any, depth int) any {
 		}
 		return out
 	case map[string]any:
-		if strings.EqualFold(path.Base(strings.ReplaceAll(key, ".", "/")), "env") {
+		if nameOnly(key) {
 			keys := make([]any, 0, len(t))
 			for _, k := range SortedKeys(t) {
 				keys = append(keys, k)
