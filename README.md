@@ -69,7 +69,7 @@ jobs:
           args: verify --frozen
 ```
 
-The action downloads the release, verifies its Sigstore signature and checksum before running it, writes a job summary, and uploads SARIF so each drifted item and policy finding shows up in code scanning. See [Breaktroughf1/lockward-action](https://github.com/Breaktroughf1/lockward-action).
+The action downloads the release, verifies its Sigstore signature and checksum before running it, writes a job summary, and uploads SARIF so each drifted item and policy finding shows up in code scanning. It is listed on the GitHub Marketplace as [Lockward Verify](https://github.com/marketplace/actions/lockward-verify) (source: [Breaktroughf1/lockward-action](https://github.com/Breaktroughf1/lockward-action)).
 
 ## What it does
 
