@@ -26,7 +26,7 @@ jobs:
 
 | Input | Default | Description |
 |---|---|---|
-| `version` | `0.2.1` | Release to install, without the leading `v` |
+| `version` | `0.2.2` | Release to install, without the leading `v` |
 | `args` | `verify --frozen` | Arguments passed to `lockward` |
 | `sarif` | `true` | For `verify`, also upload a SARIF report to code scanning (needs `security-events: write`) |
 | `working-directory` | `.` | Directory to run in |

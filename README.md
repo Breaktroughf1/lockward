@@ -103,8 +103,8 @@ Exit codes: `0` clean, `1` drift, `2` policy violation, `3` usage or configurati
 - **Container** (GHCR, multi-arch, distroless, non-root, signed): mount the repository at `/src`.
 
   ```sh
-  docker run --rm -v "$PWD:/src:ro" ghcr.io/breaktroughf1/lockward:0.2.1 verify --scope project --frozen
-  cosign verify ghcr.io/breaktroughf1/lockward:0.2.1 \
+  docker run --rm -v "$PWD:/src:ro" ghcr.io/breaktroughf1/lockward:0.2.2 verify --scope project --frozen
+  cosign verify ghcr.io/breaktroughf1/lockward:0.2.2 \
     --certificate-identity-regexp '^https://github\.com/Breaktroughf1/lockward/\.github/workflows/container\.yml@refs/(heads/main|tags/v[0-9.]+)$' \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com
   ```
@@ -112,10 +112,10 @@ Exit codes: `0` clean, `1` drift, `2` policy violation, `3` usage or configurati
 
   ```sh
   cosign verify-blob --bundle checksums.txt.sigstore.json \
-    --certificate-identity "https://github.com/Breaktroughf1/lockward/.github/workflows/release.yml@refs/tags/v0.2.1" \
+    --certificate-identity "https://github.com/Breaktroughf1/lockward/.github/workflows/release.yml@refs/tags/v0.2.2" \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com checksums.txt
   sha256sum --ignore-missing -c checksums.txt
-  gh attestation verify lockward_0.2.1_linux_amd64.tar.gz --repo Breaktroughf1/lockward
+  gh attestation verify lockward_0.2.2_linux_amd64.tar.gz --repo Breaktroughf1/lockward
   ```
 
 ## Trust properties
