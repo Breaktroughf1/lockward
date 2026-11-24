@@ -378,3 +378,80 @@ func FuzzConfigParsers(f *testing.F) {
 		}
 	})
 }
+
+// A symlink in a parent component (not only the last) must be resolved
+// within the root, including absolute targets, which os.Root refuses.
+func TestRealResolvesEveryComponent(t *testing.T) {
+	outer := t.TempDir()
+	dir := filepath.Join(outer, "root")
+	write(t, outer, map[string]string{
+		"root/code/kit/cmds/a.md": "A", "root/code/kit/top.md": "T", "secret/s.md": "S",
+	})
+	symlink(t, filepath.Join(dir, "code", "kit"), filepath.Join(dir, "kit-abs")) // absolute, in root
+	symlink(t, "code/kit", filepath.Join(dir, "kit-rel"))                        // relative, in root
+	symlink(t, filepath.Join(dir, "kit-abs", "cmds", "a.md"), filepath.Join(dir, "via-abs.md"))
+	symlink(t, "../top.md", filepath.Join(dir, "code", "kit", "cmds", "up.md")) // .. after a real dir
+	symlink(t, filepath.Join(outer, "secret"), filepath.Join(dir, "out"))       // absolute, escapes
+	symlink(t, "../../secret", filepath.Join(dir, "code", "esc"))               // relative, escapes
+	symlink(t, dir, filepath.Join(dir, "self"))                                 // the root itself
+	symlink(t, "..", filepath.Join(dir, "code", "parent"))                      // back to the root
+	src := newSource(t, dir, asset.ScopeUser)
+
+	for p, want := range map[string]string{
+		"kit-abs/cmds/a.md":      "code/kit/cmds/a.md",
+		"kit-rel/cmds/a.md":      "code/kit/cmds/a.md",
+		"via-abs.md":             "code/kit/cmds/a.md",
+		"kit-abs/cmds/up.md":     "code/kit/top.md",
+		"kit-rel/cmds/../top.md": "code/kit/top.md",
+	} {
+		got, k, esc := src.Real(p)
+		if got != want || k != RegularFile || esc {
+			t.Errorf("Real(%s) = %q %v %v, want %q", p, got, k, esc, want)
+		}
+		if b, ok, problem := src.ReadConfig(p); !ok || problem != "" || len(b) != 1 {
+			t.Errorf("ReadConfig(%s) = %q %v %q", p, b, ok, problem)
+		}
+	}
+	for _, p := range []string{"out/s.md", "code/esc/s.md", "self", "code/parent"} {
+		if _, _, esc := src.Real(p); !esc {
+			t.Errorf("Real(%s) must escape", p)
+		}
+	}
+	if got, k, esc := src.Real("self/code"); got != "code" || k != Directory || esc {
+		t.Errorf("Real(self/code) = %q %v %v", got, k, esc)
+	}
+	if _, k, esc := src.Real("kit-abs/cmds/nope.md"); k != Missing || esc {
+		t.Errorf("missing file under linked dir = %v %v", k, esc)
+	}
+	if _, k, _ := src.Real("code/kit/top.md/x"); k != Missing {
+		t.Errorf("path through a file = %v", k)
+	}
+
+	// Stat describes the last component itself and follows linked parents.
+	for p, want := range map[string]Kind{
+		"kit-abs/cmds/a.md": RegularFile, "kit-abs/cmds": Directory, "via-abs.md": Symlink,
+		"kit-abs": Symlink, "kit-abs/nope": Missing, "out/s.md": Missing, "code/kit/top.md/x": Missing,
+	} {
+		if got := src.Stat(p); got != want {
+			t.Errorf("Stat(%s) = %v, want %v", p, got, want)
+		}
+	}
+	if loc, ok := src.Locate("kit-abs/cmds/up.md"); !ok || loc != "code/kit/cmds/up.md" {
+		t.Errorf("Locate = %q %v", loc, ok)
+	}
+	if loc, ok := src.Locate("top"); !ok || loc != "top" {
+		t.Errorf("Locate(top) = %q %v", loc, ok)
+	}
+	if _, ok := src.Locate("out/s.md"); ok {
+		t.Error("Locate under an escaping link must fail")
+	}
+	if got := src.Children("code/esc"); got != nil {
+		t.Errorf("Children through an escaping link = %v", got)
+	}
+	if got := src.Children("kit-rel/cmds"); len(got) != 2 {
+		t.Errorf("Children through a linked parent = %v", got)
+	}
+	if got := src.EscapedDirs(); !slices.Equal(got, []string{"code/esc", "out"}) {
+		t.Errorf("EscapedDirs = %v", got)
+	}
+}

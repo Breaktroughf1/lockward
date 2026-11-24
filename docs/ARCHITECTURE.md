@@ -88,7 +88,7 @@ type Source struct {
 ```
 
 Rules:
-- Read only through `Source`: `ReadConfig`, `Children`, `Files`, `Stat`/`Real`, and the cached project walk (`Nested`, `NestedDirs`). Never execute anything; never follow symlinks outside the root (`Source.Real` resolves chains lexically, including absolute targets inside the root).
+- Read only through `Source`: `ReadConfig`, `Children`, `Files`, `Stat`/`Real`, and the cached project walk (`Nested`, `NestedDirs`). Never execute anything; never follow symlinks outside the root (`Source.Real` resolves symlinks lexically in every path component, including absolute targets inside the root; `Stat` follows linked parent directories; a link outside the root is reported through `EscapedDirs`).
 - Each path is emitted by exactly one adapter (its owner) with `LoadedBy` listing every agent that reads it; discovery merges duplicates defensively.
 - Missing config → zero assets, not an error. Malformed config → pinned as raw bytes plus a reported problem, never a crash.
 - Secret values never leave the adapter: MCP and hook parsing reduce env and header maps to names and redact arguments and URLs; the locations of inline secrets travel on `Asset.InlineSecrets` for policy only and are never serialised.

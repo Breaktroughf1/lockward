@@ -145,6 +145,10 @@ func (res *Result) run(ctx context.Context, opts Options) error {
 		assets = append(assets, found.Assets...)
 		res.Problems = append(res.Problems, found.Problems...)
 	}
+	for _, d := range src.EscapedDirs() {
+		res.Problems = append(res.Problems, asset.Problem{Agent: "lockward", Path: d,
+			Message: "directory is a symlink to a location outside the scan root; its contents were not scanned. Widen the scan root (--root or --home) to include the target"})
+	}
 	assets = merge(assets)
 	assignNames(assets)
 
@@ -267,8 +271,12 @@ func (b *builder) entry(a *asset.Asset) (asset.Entry, []asset.Problem, error) {
 }
 
 func (b *builder) rawFile(a *asset.Asset, e *asset.Entry) ([]asset.Problem, error) {
-	if b.src.Stat(a.File) == adapter.Symlink {
-		target, err := hash.ReadLink(b.src.FS, a.File)
+	file, ok := b.src.Locate(a.File)
+	if !ok {
+		return nil, errors.New("file's parent directory resolves outside the scan root")
+	}
+	if b.src.Stat(file) == adapter.Symlink {
+		target, err := hash.ReadLink(b.src.FS, file)
 		if err != nil {
 			return nil, fmt.Errorf("readlink: %w", err)
 		}
@@ -277,11 +285,16 @@ func (b *builder) rawFile(a *asset.Asset, e *asset.Entry) ([]asset.Problem, erro
 		}
 		e.Symlink = target
 	}
-	resolved, _, escaped := b.src.Real(a.File)
-	if escaped {
+	resolved, k, escaped := b.src.Real(file)
+	switch {
+	case escaped:
 		e.Digest = hash.SymlinkedTreeDigest(e.Symlink, "")
 		return []asset.Problem{{Agent: a.Agent, Path: a.File,
 			Message: "symlink points outside the scan root; only the link target is pinned, not the content"}}, nil
+	case k == adapter.Missing:
+		e.Digest = hash.SymlinkedTreeDigest(e.Symlink, "")
+		return []asset.Problem{{Agent: a.Agent, Path: a.File,
+			Message: "dangling symlink; only the link target is pinned. Fix or remove the link, then run 'lockward lock'"}}, nil
 	}
 	d, _, err := hash.File(b.src.FS, resolved)
 	if err != nil {
@@ -294,7 +307,10 @@ func (b *builder) rawFile(a *asset.Asset, e *asset.Entry) ([]asset.Problem, erro
 
 func (b *builder) skill(a *asset.Asset, e *asset.Entry) ([]asset.Problem, error) {
 	opts := hash.TreeOptions{MaxMembers: b.maxMembers, Ignore: b.src.Ignored}
-	dir := a.File
+	dir, ok := b.src.Locate(a.File)
+	if !ok {
+		return nil, errors.New("skill's parent directory resolves outside the scan root")
+	}
 	var target string
 	switch b.src.Stat(dir) {
 	case adapter.Symlink:
@@ -310,7 +326,7 @@ func (b *builder) skill(a *asset.Asset, e *asset.Entry) ([]asset.Problem, error)
 		resolved, k, escaped := b.src.Real(dir)
 		if escaped || k == adapter.Missing {
 			e.Digest = hash.SymlinkedTreeDigest(t, "")
-			return []asset.Problem{{Agent: a.Agent, Path: dir,
+			return []asset.Problem{{Agent: a.Agent, Path: a.File,
 				Message: "skill is a symlink to a location outside the scan root (or a dangling link); its contents are not pinned"}}, nil
 		}
 		if k != adapter.Directory {

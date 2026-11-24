@@ -325,3 +325,71 @@ func TestMergeAndNames(t *testing.T) {
 		t.Errorf("collision names = %q, %q", out[1].Name, out[2].Name)
 	}
 }
+
+// A rules file reached through a linked parent directory is pinned by
+// content; a dangling rules link is a problem, not a fatal error.
+func TestRulesThroughLinkedParentAndDangling(t *testing.T) {
+	root := t.TempDir()
+	write(t, root, map[string]string{"kit/claude.md": "kit rules", ".claude/rules/.keep": ""})
+	symlink(t, filepath.Join(root, "kit"), filepath.Join(root, ".claude", "kitlink"))
+	symlink(t, filepath.Join(root, ".claude", "kitlink", "claude.md"), filepath.Join(root, ".claude", "rules", "kit.md"))
+	symlink(t, "nowhere.md", filepath.Join(root, ".claude", "rules", "gone.md"))
+	res := run(t, root, asset.ScopeProject)
+	m := map[string]asset.Entry{}
+	for _, e := range res.Entries {
+		m[e.Path] = e
+	}
+	if e := m[".claude/rules/kit.md"]; e.Digest != hash.SumString("kit rules") {
+		t.Errorf("linked-parent rules = %+v", e)
+	}
+	if e, ok := m[".claude/rules/gone.md"]; !ok || e.Symlink != "nowhere.md" {
+		t.Errorf("dangling rules = %+v", e)
+	}
+	found := false
+	for _, p := range res.Problems {
+		found = found || (p.Path == ".claude/rules/gone.md" && strings.Contains(p.Message, "dangling"))
+	}
+	if !found {
+		t.Errorf("dangling rules link not reported: %+v", res.Problems)
+	}
+}
+
+// A dotfiles-style home where ~/.claude is an absolute symlink into the home
+// (GNU Stow, chezmoi symlink mode) must be discovered in full. v0.2.1 found
+// nothing and said nothing. A linked directory outside the root is reported.
+func TestLinkedAgentDirectory(t *testing.T) {
+	outer := t.TempDir()
+	home := filepath.Join(outer, "home")
+	write(t, outer, map[string]string{
+		"home/dotfiles/claude/skills/s/SKILL.md": "# s\n",
+		"home/dotfiles/claude/CLAUDE.md":         "rules\n",
+		"home/dotfiles/claude/settings.json":     `{"permissions":{"allow":["Bash(*)"]}}`,
+		"elsewhere/skills/x/SKILL.md":            "# x\n",
+	})
+	symlink(t, filepath.Join(home, "dotfiles", "claude"), filepath.Join(home, ".claude"))
+	symlink(t, filepath.Join(outer, "elsewhere", "skills"), filepath.Join(home, ".agents"))
+	res := run(t, home, asset.ScopeUser)
+	m := byID(res)
+	if e := m["skill:claude-code:s"]; e.Path != ".claude/skills/s" || len(e.Files) != 1 {
+		t.Errorf("skill under linked ~/.claude = %+v", e)
+	}
+	if e := m["rules:claude-code:.claude/CLAUDE.md"]; e.Digest != hash.SumString("rules\n") {
+		t.Errorf("rules under linked ~/.claude = %+v (entries %v)", e, keys(m))
+	}
+	if _, ok := m["settings:claude-code:.claude/settings.json"]; !ok {
+		t.Errorf("settings under linked ~/.claude missing (entries %v)", keys(m))
+	}
+	found := false
+	for _, p := range res.Problems {
+		found = found || (p.Path == ".agents" && strings.Contains(p.Message, "outside the scan root"))
+	}
+	n := 0
+	for _, p := range res.Problems {
+		if strings.HasPrefix(p.Path, ".agents") {
+			n++
+		}
+	}
+	if !found || n != 1 {
+		t.Errorf("escaping linked directory must be reported once: %+v", res.Problems)
+	}
+}

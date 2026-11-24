@@ -55,6 +55,51 @@ type Source struct {
 	once    sync.Once
 	entries []WalkEntry
 	walkErr error
+
+	mu      sync.Mutex
+	escaped map[string]bool // directories skipped because they link outside the root
+}
+
+// EscapedDirs lists the symlinks pointing outside the root that hid a
+// directory Children or Stat was asked about, sorted. Their
+// contents were not scanned; discovery reports each one as a problem.
+func (s *Source) EscapedDirs() []string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := make([]string, 0, len(s.escaped))
+	for d := range s.escaped {
+		out = append(out, d)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// Locate returns the symlink-free root-relative path of p's parent joined
+// with p's own name, so that p itself is not followed (an Lstat of the
+// result describes p) but any linked parent directory is. ok is false when
+// a parent links outside the root.
+func (s *Source) Locate(p string) (string, bool) {
+	loc, escapedDir := s.locate(p)
+	return loc, escapedDir == ""
+}
+
+// locate is Locate, returning the parent directory that escapes the root
+// (empty when none does). A parent that is missing or not a directory
+// leaves p unchanged: the Lstat that follows reports it missing.
+func (s *Source) locate(p string) (loc, escapedDir string) {
+	dir, name := path.Split(p)
+	if dir == "" {
+		return p, ""
+	}
+	dir = path.Clean(dir)
+	resolved, k, escaped := s.Real(dir)
+	switch {
+	case escaped:
+		return p, resolved // the link that escapes
+	case k != Directory:
+		return p, ""
+	}
+	return path.Join(resolved, name), ""
 }
 
 // WalkEntry is one path found by Source.Walk.
@@ -174,12 +219,117 @@ const (
 	Other
 )
 
-// Stat classifies p using Lstat, so a symlink is reported as Symlink.
+// Stat classifies p using Lstat, so a symlink at p is reported as Symlink.
+// Linked parent directories are followed within the root; a parent that
+// links outside the root makes p Missing and is reported by EscapedDirs.
 func (s *Source) Stat(p string) Kind {
 	if s.Ignored(p, false) {
 		return Missing
 	}
-	info, err := fs.Lstat(s.FS, p)
+	loc, escapedDir := s.locate(p)
+	if escapedDir != "" {
+		s.noteEscaped(escapedDir)
+		return Missing
+	}
+	return lstatKind(s.FS, loc)
+}
+
+func (s *Source) noteEscaped(dir string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.escaped == nil {
+		s.escaped = map[string]bool{}
+	}
+	s.escaped[dir] = true
+}
+
+// Resolve reports what p points to, following symlinks only within the root.
+// escaped is true when p is a symlink whose target lies outside the root.
+func (s *Source) Resolve(p string) (k Kind, escaped bool) {
+	_, k, escaped = s.Real(p)
+	return k, escaped
+}
+
+// maxLinkDepth bounds symlink chains (and loops).
+const maxLinkDepth = 40
+
+// Real resolves p to the root-relative path it finally refers to, following
+// symlinks in every path component (not only the last), all within the
+// root. Absolute targets are mapped through RootDir, because os.Root refuses
+// every absolute link even when it points inside the root (common for
+// dotfiles, including a linked parent directory). A component whose target
+// lies outside the root, or a loop, makes the result escaped. The returned
+// path contains no symlinks, so it can be opened through FS.
+func (s *Source) Real(p string) (resolved string, k Kind, escaped bool) {
+	if s.Ignored(p, false) {
+		return p, Missing, false
+	}
+	rest := splitPath(p)
+	done := ""
+	hops := 0
+	for len(rest) > 0 {
+		c := rest[0]
+		rest = rest[1:]
+		switch c {
+		case "", ".":
+			continue
+		case "..":
+			if done == "" {
+				return p, Symlink, true
+			}
+			done = parentDir(done)
+			continue
+		}
+		next := path.Join(done, c)
+		switch kind := lstatKind(s.FS, next); kind {
+		case Symlink:
+			if hops++; hops > maxLinkDepth {
+				return next, Symlink, true
+			}
+			target, err := hash.ReadLink(s.FS, next)
+			if err != nil {
+				return next, Symlink, true
+			}
+			if filepath.IsAbs(target) || strings.HasPrefix(target, "/") {
+				rel, ok := s.linkTarget(target)
+				if !ok {
+					return next, Symlink, true
+				}
+				done, rest = "", append(splitPath(rel), rest...)
+				continue
+			}
+			rest = append(splitPath(filepath.ToSlash(target)), rest...)
+		case Missing:
+			return path.Join(append([]string{next}, rest...)...), Missing, false
+		default:
+			if len(rest) > 0 && kind != Directory {
+				return path.Join(append([]string{next}, rest...)...), Missing, false
+			}
+			done = next
+		}
+	}
+	if done == "" {
+		// A link to the scan root itself would pin the whole root.
+		return ".", Directory, hops > 0
+	}
+	if s.Ignored(done, false) {
+		return done, Missing, false
+	}
+	return done, lstatKind(s.FS, done), false
+}
+
+func splitPath(p string) []string { return strings.Split(p, "/") }
+
+func parentDir(p string) string {
+	if d := path.Dir(p); d != "." {
+		return d
+	}
+	return ""
+}
+
+// lstatKind classifies p without applying ignore patterns.
+func lstatKind(fsys fs.FS, p string) Kind {
+	info, err := fs.Lstat(fsys, p)
 	if err != nil {
 		return Missing
 	}
@@ -195,59 +345,18 @@ func (s *Source) Stat(p string) Kind {
 	}
 }
 
-// Resolve reports what p points to, following symlinks only within the root.
-// escaped is true when p is a symlink whose target lies outside the root.
-func (s *Source) Resolve(p string) (k Kind, escaped bool) {
-	_, k, escaped = s.Real(p)
-	return k, escaped
-}
-
-// maxLinkDepth bounds symlink chains (and loops).
-const maxLinkDepth = 40
-
-// Real follows a chain of symlinks at p and returns the root-relative path it
-// finally refers to. Absolute targets are mapped through RootDir, because
-// os.Root refuses every absolute link even when it points inside the root
-// (common for dotfiles). A target outside the root, or a loop, is escaped.
-func (s *Source) Real(p string) (resolved string, k Kind, escaped bool) {
-	cur := p
-	for range maxLinkDepth {
-		switch k := s.Stat(cur); k {
-		case Symlink:
-			target, err := hash.ReadLink(s.FS, cur)
-			if err != nil {
-				return cur, Symlink, true
-			}
-			next, ok := s.linkTarget(cur, target)
-			if !ok {
-				return cur, Symlink, true
-			}
-			cur = next
-		default: // a real entry, or Missing (possibly a dangling link)
-			return cur, k, false
-		}
+// linkTarget maps an absolute symlink target to a root-relative path,
+// lexically. Relative targets are resolved component by component in Real.
+func (s *Source) linkTarget(target string) (string, bool) {
+	if s.RootDir == "" {
+		return "", false
 	}
-	return cur, Symlink, true
-}
-
-// linkTarget maps a symlink target to a root-relative path, lexically.
-func (s *Source) linkTarget(link, target string) (string, bool) {
-	var rel string
-	switch {
-	case filepath.IsAbs(target) || strings.HasPrefix(target, "/"):
-		if s.RootDir == "" {
-			return "", false
-		}
-		r, err := filepath.Rel(s.RootDir, filepath.FromSlash(target))
-		if err != nil {
-			return "", false
-		}
-		rel = filepath.ToSlash(r)
-	default:
-		rel = path.Join(path.Dir(link), filepath.ToSlash(target))
+	r, err := filepath.Rel(s.RootDir, filepath.FromSlash(target))
+	if err != nil {
+		return "", false
 	}
-	rel = path.Clean(rel)
-	if rel == "." || rel == ".." || strings.HasPrefix(rel, "../") || !fs.ValidPath(rel) {
+	rel := path.Clean(filepath.ToSlash(r))
+	if rel == ".." || strings.HasPrefix(rel, "../") || (rel != "." && !fs.ValidPath(rel)) {
 		return "", false
 	}
 	return rel, true
@@ -297,6 +406,9 @@ func (s *Source) ReadConfig(p string) (b []byte, ok bool, problem string) {
 // symlink on dir itself unless it resolves inside the root), sorted.
 func (s *Source) Children(dir string) []fs.DirEntry {
 	resolved, k, escaped := s.Real(dir)
+	if escaped {
+		s.noteEscaped(resolved) // the link that escapes
+	}
 	if k != Directory || escaped {
 		return nil
 	}

@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- **Linked agent directories were skipped without a warning.** When a directory such as `~/.claude` was a symlink, including an absolute one inside the scan root (the usual setup with GNU Stow or chezmoi), assets under it were not discovered, so `lock` pinned nothing and said nothing. Symlinks are now resolved in every path component, still only within the scan root. A file reached through a linked parent directory could also stop `lock` with a configuration error. Affects v0.1.0 to v0.2.1. After upgrading, run `lockward lock` (or `lockward verify` to see what was missing).
+- A directory symlink that points outside the scan root is reported once as a problem, instead of its contents being skipped without notice.
+- A dangling symlink as a rules file is reported as a problem, instead of stopping `lock` with a configuration error.
+- The prose diff's table-size check cannot overflow, whatever the input sizes (CodeQL).
+
+### Added
+- CodeQL analysis (`security-extended`) for the Go code and the workflows, and an OpenSSF Scorecard badge.
+
 ## [0.2.1] - 2026-11-24
 
 ### Security
@@ -63,6 +74,7 @@ First public release.
 - GitHub Action that verifies the release's Sigstore signature and checksum before running.
 - Reproducible release builds for Linux, macOS and Windows on amd64 and arm64, with a cosign-signed `checksums.txt` and SLSA build provenance.
 
+[Unreleased]: https://github.com/Breaktroughf1/lockward/compare/v0.2.1...HEAD
 [0.2.1]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.1.1
