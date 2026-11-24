@@ -111,8 +111,10 @@ func Args(args []string) (out []string, masked []int) {
 			masked = append(masked, i)
 			continue
 		}
-		if k, v, ok := strings.Cut(a, "="); ok && v != "" && !IsReference(v) && SensitiveName(k) {
-			out[i] = k + "=" + Mask
+		if k, v, ok := strings.Cut(a, "="); ok && v != "" && !IsReference(v) && argName.MatchString(k) && SensitiveName(k) {
+			// String also runs over the name: never trust that only the value
+			// can hold a secret.
+			out[i] = String(k) + "=" + Mask
 			masked = append(masked, i)
 			continue
 		}
@@ -123,6 +125,10 @@ func Args(args []string) (out []string, masked []int) {
 	}
 	return out, masked
 }
+
+// argName matches a NAME or --flag in a NAME=VALUE argument; anything with
+// spaces or other characters is not treated as a name.
+var argName = regexp.MustCompile(`^-{0,2}[A-Za-z_][A-Za-z0-9_.-]*$`)
 
 func isSensitiveFlag(a string) bool {
 	if !strings.HasPrefix(a, "-") || strings.Contains(a, "=") {

@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Security
+- **Token leak in redaction:** for a `NAME=VALUE` argument, only the value was masked, so a token earlier in the same argument could be written to `lockward.lock` (for example an MCP server launched with `bash -c "curl -H 'Authorization: Bearer <token>' https://…?pwd=1"`). Names must now look like identifiers, and token masking always runs over the whole argument. Found by fuzzing; affects v0.1.0 to v0.2.0. Re-run `lockward lock` after upgrading if a lockfile may contain such an argument.
+
 ### Added
 - GitHub Action published from [Breaktroughf1/lockward-action](https://github.com/Breaktroughf1/lockward-action) (root `action.yml`, for the Marketplace), tested from this repository on Linux, macOS and Windows.
 - Homebrew: `brew install breaktroughf1/tap/lockward` on macOS and Linux (Intel and ARM). The tap's formula is generated from each release's Sigstore-verified checksums, with no shared token.

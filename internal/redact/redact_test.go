@@ -124,3 +124,18 @@ func TestHeaderStyleSecrets(t *testing.T) {
 		t.Errorf("Args header = %q %v", out, masked)
 	}
 }
+
+// TestArgsNameCannotHideToken is the fuzz finding: in "text TOKEN textPWd=0"
+// only the value after "=" was masked, leaking the token before it.
+func TestArgsNameCannotHideToken(t *testing.T) {
+	const tok = "ghp_abcdefghijklmnopqrstuvwxyz0123"
+	for _, a := range []string{"a00000a " + tok + " 000000PWd=0", tok + "_PASSWORD=x", "--api-key=" + tok} {
+		out, _ := Args([]string{a})
+		if strings.Contains(out[0], tok) {
+			t.Errorf("Args(%q) = %q leaks the token", a, out[0])
+		}
+	}
+	if out, _ := Args([]string{"DB_PASSWORD=hunter2"}); out[0] != "DB_PASSWORD="+Mask {
+		t.Errorf("NAME=VALUE masking regressed: %q", out[0])
+	}
+}
