@@ -268,7 +268,7 @@ func (b *builder) entry(a *asset.Asset) (asset.Entry, []asset.Problem, error) {
 
 func (b *builder) rawFile(a *asset.Asset, e *asset.Entry) ([]asset.Problem, error) {
 	if b.src.Stat(a.File) == adapter.Symlink {
-		target, err := fs.ReadLink(b.src.FS, a.File)
+		target, err := hash.ReadLink(b.src.FS, a.File)
 		if err != nil {
 			return nil, fmt.Errorf("readlink: %w", err)
 		}
@@ -298,7 +298,7 @@ func (b *builder) skill(a *asset.Asset, e *asset.Entry) ([]asset.Problem, error)
 	var target string
 	switch b.src.Stat(dir) {
 	case adapter.Symlink:
-		t, err := fs.ReadLink(b.src.FS, dir)
+		t, err := hash.ReadLink(b.src.FS, dir)
 		if err != nil {
 			return nil, fmt.Errorf("readlink: %w", err)
 		}

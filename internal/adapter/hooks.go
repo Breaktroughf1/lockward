@@ -177,7 +177,7 @@ func resolveToken(src *Source, tok, baseDir string) (string, bool) {
 	}
 	switch {
 	case anchored:
-	case strings.HasPrefix(tok, "/"):
+	case strings.HasPrefix(tok, "/") || filepath.IsAbs(filepath.FromSlash(tok)):
 		if src.RootDir == "" {
 			return "", false
 		}

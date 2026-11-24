@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	"github.com/Breaktroughf1/lockward/internal/asset"
+	"github.com/Breaktroughf1/lockward/internal/hash"
 	"github.com/Breaktroughf1/lockward/internal/ignore"
 )
 
@@ -213,7 +214,7 @@ func (s *Source) Real(p string) (resolved string, k Kind, escaped bool) {
 	for range maxLinkDepth {
 		switch k := s.Stat(cur); k {
 		case Symlink:
-			target, err := fs.ReadLink(s.FS, cur)
+			target, err := hash.ReadLink(s.FS, cur)
 			if err != nil {
 				return cur, Symlink, true
 			}

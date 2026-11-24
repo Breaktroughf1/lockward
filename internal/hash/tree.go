@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -112,7 +113,7 @@ func TreeDigest(fsys fs.FS, dir string, opts TreeOptions) (Tree, error) {
 func member(fsys fs.FS, p, rel string, d fs.DirEntry) (Member, error) {
 	switch typ := d.Type(); {
 	case typ&fs.ModeSymlink != 0:
-		target, err := fs.ReadLink(fsys, p)
+		target, err := ReadLink(fsys, p)
 		if err != nil {
 			return Member{}, fmt.Errorf("readlink %s: %w", p, err)
 		}
@@ -133,6 +134,17 @@ func member(fsys fs.FS, p, rel string, d fs.DirEntry) (Member, error) {
 	default:
 		return Member{Path: rel, Kind: KindSpecial, Mode: "0000", Special: specialName(typ)}, nil
 	}
+}
+
+// ReadLink returns a symlink's target with "/" separators. Windows reports
+// targets with "\"; normalising keeps lockfiles identical across operating
+// systems (SPEC §2). On other systems the target is returned unchanged.
+func ReadLink(fsys fs.FS, p string) (string, error) {
+	t, err := fs.ReadLink(fsys, p)
+	if err != nil {
+		return "", err
+	}
+	return filepath.ToSlash(t), nil
 }
 
 // NormalizeMode maps permission bits to "0755" if any execute bit is set and

@@ -117,10 +117,12 @@ jobs:
           done
       - name: Two builds are byte-identical (LW-NFR-08)
         run: |
-          CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=ci" -o a ./cmd/lockward
+          # Write outside the checkout: an untracked file would mark the second
+          # build's embedded VCS info as modified.
+          CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=ci" -o "$RUNNER_TEMP/a" ./cmd/lockward
           go clean -cache
-          CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=ci" -o b ./cmd/lockward
-          cmp a b
+          CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=ci" -o "$RUNNER_TEMP/b" ./cmd/lockward
+          cmp "$RUNNER_TEMP/a" "$RUNNER_TEMP/b"
 
   dogfood:
     name: verify this repository's own agent assets
