@@ -2,10 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.2.1] - 2026-11-24
 
 ### Security
 - **Token leak in redaction:** for a `NAME=VALUE` argument, only the value was masked, so a token earlier in the same argument could be written to `lockward.lock` (for example an MCP server launched with `bash -c "curl -H 'Authorization: Bearer <token>' https://…?pwd=1"`). Names must now look like identifiers, and token masking always runs over the whole argument. Found by fuzzing; affects v0.1.0 to v0.2.0. Re-run `lockward lock` after upgrading if a lockfile may contain such an argument.
+
+### Changed
+- The GitHub Action installs 0.2.1 by default.
 
 ### Added
 - GitHub Action published from [Breaktroughf1/lockward-action](https://github.com/Breaktroughf1/lockward-action) (root `action.yml`, for the Marketplace), tested from this repository on Linux, macOS and Windows.
@@ -60,6 +63,7 @@ First public release.
 - GitHub Action that verifies the release's Sigstore signature and checksum before running.
 - Reproducible release builds for Linux, macOS and Windows on amd64 and arm64, with a cosign-signed `checksums.txt` and SLSA build provenance.
 
+[0.2.1]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.1.0
