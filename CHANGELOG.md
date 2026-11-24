@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Homebrew: `brew install breaktroughf1/tap/lockward` on macOS and Linux (Intel and ARM). The tap's formula is generated from each release's Sigstore-verified checksums, with no shared token.
+
 ## [0.2.0] - 2026-11-24
 
 ### Security

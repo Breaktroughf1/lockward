@@ -15,7 +15,7 @@ The common recommendation is to pin what you trust, review every change and keep
 ## Quick start
 
 ```sh
-go install github.com/Breaktroughf1/lockward/cmd/lockward@latest   # or download a signed release, below
+brew install breaktroughf1/tap/lockward   # or go install / a signed release, below
 
 cd your-repo
 lockward init        # writes lockward.policy.yaml and .lockwardignore
@@ -96,6 +96,7 @@ Exit codes: `0` clean, `1` drift, `2` policy violation, `3` usage or configurati
 
 ## Install
 
+- **Homebrew** (macOS and Linux): `brew install breaktroughf1/tap/lockward`. With Homebrew 6 or later this trusts only the `lockward` formula, not the whole tap. The [tap](https://github.com/Breaktroughf1/homebrew-tap) regenerates its formula from each release's Sigstore-verified checksums and installs it on macOS and Linux before publishing.
 - **Go:** `go install github.com/Breaktroughf1/lockward/cmd/lockward@latest` (Go 1.27 or later).
 - **Releases:** static binaries for Linux, macOS and Windows on amd64 and arm64 on the [releases page](https://github.com/Breaktroughf1/lockward/releases). Each release has a Sigstore-signed `checksums.txt` and SLSA build provenance:
 

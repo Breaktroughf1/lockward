@@ -117,4 +117,4 @@ CycloneDX and SARIF are emitted from small local structs instead of SDKs. No dep
 - GoReleaser: linux/darwin/windows × amd64/arm64, `CGO_ENABLED=0`, `-trimpath`, commit-time `mod_timestamp`, source archive.
 - `checksums.txt` signed keylessly with cosign (Sigstore bundle), SLSA build provenance via `actions/attest-build-provenance`.
 - The GitHub Action verifies the Sigstore identity (`release.yml` at the release tag) and the archive checksum before running the binary.
-- Distribution: GitHub Releases and `go install`. Homebrew tap and npm/PyPI wrappers are planned.
+- Distribution: GitHub Releases, `go install`, and the Homebrew tap [Breaktroughf1/homebrew-tap](https://github.com/Breaktroughf1/homebrew-tap). The tap needs no token: a scheduled workflow there verifies each release's `checksums.txt` with Sigstore (identity: this repository's `release.yml` at the tag), regenerates the formula from it, installs and tests it with Homebrew, and only then commits with its own `GITHUB_TOKEN`. npm and PyPI wrappers are planned.
