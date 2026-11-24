@@ -100,6 +100,14 @@ Exit codes: `0` clean, `1` drift, `2` policy violation, `3` usage or configurati
 
 - **Homebrew** (macOS and Linux): `brew install breaktroughf1/tap/lockward`. With Homebrew 6 or later this trusts only the `lockward` formula, not the whole tap. The [tap](https://github.com/Breaktroughf1/homebrew-tap) regenerates its formula from each release's Sigstore-verified checksums and installs it on macOS and Linux before publishing.
 - **Go:** `go install github.com/Breaktroughf1/lockward/cmd/lockward@latest` (Go 1.27 or later).
+- **Container** (GHCR, multi-arch, distroless, non-root, signed): mount the repository at `/src`.
+
+  ```sh
+  docker run --rm -v "$PWD:/src:ro" ghcr.io/breaktroughf1/lockward:0.2.1 verify --scope project --frozen
+  cosign verify ghcr.io/breaktroughf1/lockward:0.2.1 \
+    --certificate-identity-regexp '^https://github\.com/Breaktroughf1/lockward/\.github/workflows/container\.yml@refs/(heads/main|tags/v[0-9.]+)$' \
+    --certificate-oidc-issuer https://token.actions.githubusercontent.com
+  ```
 - **Releases:** static binaries for Linux, macOS and Windows on amd64 and arm64 on the [releases page](https://github.com/Breaktroughf1/lockward/releases). Each release has a Sigstore-signed `checksums.txt` and SLSA build provenance:
 
   ```sh
