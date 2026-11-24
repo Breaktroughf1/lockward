@@ -11,6 +11,7 @@ import (
 	"github.com/Breaktroughf1/lockward/internal/asset"
 	"github.com/Breaktroughf1/lockward/internal/lock"
 	"github.com/Breaktroughf1/lockward/internal/policy"
+	"github.com/Breaktroughf1/lockward/internal/scanner"
 )
 
 // InformationURI is the project home used in SARIF and CycloneDX output.
@@ -38,6 +39,9 @@ type Scope struct {
 	Ignored        int
 	Notices        []string
 	Notes          []Note // informational items (scan-repo); SARIF level "note"
+	// Scanner holds findings imported from external scanners (LW-FR-16).
+	// They are informational and never affect the exit code (ADR-0003).
+	Scanner []scanner.Finding
 }
 
 // Note is an informational SARIF result.

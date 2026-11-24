@@ -48,6 +48,7 @@ func Text(w io.Writer, r *Report, o TextOptions) error {
 		}
 		writeResults(&b, s, r.Frozen, o, p)
 		writeFindings(&b, s, p)
+		writeScanner(&b, s, p)
 		if len(s.Problems) > 0 {
 			b.WriteString("\n  problems (pinned or skipped as noted; review them):\n")
 			for _, pr := range s.Problems {
@@ -139,5 +140,33 @@ func writeFindings(b *strings.Builder, s Scope, p palette) {
 			fmt.Fprintf(b, "          at %s\n", Safe(loc))
 		}
 		fmt.Fprintf(b, "          fix: %s\n", f.Remediation)
+	}
+}
+
+// writeScanner lists imported scanner findings. They are informational.
+func writeScanner(b *strings.Builder, s Scope, p palette) {
+	if len(s.Scanner) == 0 {
+		return
+	}
+	unattached := 0
+	b.WriteString("\n  scanner findings (imported; informational, they do not change the exit code):\n")
+	for _, f := range s.Scanner {
+		target := f.EntryID
+		if target == "" {
+			unattached++
+			target = "(no matching entry)"
+		}
+		loc := f.URI
+		if f.Line > 0 {
+			loc = fmt.Sprintf("%s:%d", f.URI, f.Line)
+		}
+		fmt.Fprintf(b, "    %s%-7s%s %s %s  %s\n", p.yellow, Safe(f.Level), p.reset, Safe(f.Tool), Safe(f.RuleID), Safe(target))
+		fmt.Fprintf(b, "            %s\n", Safe(f.Message))
+		if loc != "" {
+			fmt.Fprintf(b, "            at %s\n", Safe(loc))
+		}
+	}
+	if unattached > 0 {
+		fmt.Fprintf(b, "    %d finding(s) point outside every pinned asset\n", unattached)
 	}
 }

@@ -72,6 +72,16 @@ func Text(w io.Writer, r *Result, color bool) error {
 			fmt.Fprintf(&b, "  %s%-7s%s %s %s  %s\n          %s\n          at %s\n", c, f.Severity, reset, f.Rule, f.Name, report.Safe(f.EntryID), report.Safe(f.Message), report.Safe(loc))
 		}
 	}
+	if len(r.Scanner) > 0 {
+		b.WriteString("\nscanner findings (imported; informational, they do not change the exit code):\n")
+		for _, f := range r.Scanner {
+			target := f.EntryID
+			if target == "" {
+				target = "(no matching item)"
+			}
+			fmt.Fprintf(&b, "  %-7s %s %s  %s\n          %s\n", report.Safe(f.Level), report.Safe(f.Tool), report.Safe(f.RuleID), report.Safe(target), report.Safe(f.Message))
+		}
+	}
 	if len(r.Problems) > 0 {
 		b.WriteString("\nproblems:\n")
 		for _, p := range r.Problems {
@@ -119,19 +129,23 @@ func JSON(w io.Writer, r *Result, version string) error {
 		Message  string `json:"message"`
 	}
 	out := struct {
-		SchemaVersion     int        `json:"schema_version"`
-		Tool              string     `json:"tool"`
-		Version           string     `json:"version"`
-		Root              string     `json:"root"`
-		ExitCode          int        `json:"exit_code"`
-		IgnoreFileSkipped bool       `json:"ignore_file_not_honoured"`
-		RepoPolicyIgnored bool       `json:"repo_policy_not_used"`
-		Items             []jsonItem `json:"items"`
-		Findings          []finding  `json:"findings"`
-		Problems          []string   `json:"problems"`
+		SchemaVersion     int           `json:"schema_version"`
+		Tool              string        `json:"tool"`
+		Version           string        `json:"version"`
+		Root              string        `json:"root"`
+		ExitCode          int           `json:"exit_code"`
+		IgnoreFileSkipped bool          `json:"ignore_file_not_honoured"`
+		RepoPolicyIgnored bool          `json:"repo_policy_not_used"`
+		Items             []jsonItem    `json:"items"`
+		Findings          []finding     `json:"findings"`
+		Problems          []string      `json:"problems"`
+		Scanner           []scannerJSON `json:"scanner_findings"`
 	}{SchemaVersion: 1, Tool: "lockward", Version: version, Root: r.Root, ExitCode: int(r.ExitCode),
 		IgnoreFileSkipped: r.IgnoreFileSkipped, RepoPolicyIgnored: r.RepoPolicyIgnored,
-		Items: []jsonItem{}, Findings: []finding{}, Problems: []string{}}
+		Items: []jsonItem{}, Findings: []finding{}, Problems: []string{}, Scanner: []scannerJSON{}}
+	for _, f := range r.Scanner {
+		out.Scanner = append(out.Scanner, scannerJSON{f.Tool, f.RuleID, f.Level, f.EntryID, f.URI, f.Line, f.Message})
+	}
 	for _, it := range r.Items {
 		out.Items = append(out.Items, jsonItem{ID: it.ID, Surface: string(it.Surface), Path: it.Path, LoadedBy: it.LoadedBy,
 			Executes: it.Executes, CanRun: it.CanRun, Connects: it.Connects, URLs: nonNil(it.URLs), Approvals: nonNil(it.Approvals)})
@@ -146,6 +160,16 @@ func JSON(w io.Writer, r *Result, version string) error {
 	enc.SetEscapeHTML(false)
 	enc.SetIndent("", "  ")
 	return enc.Encode(out)
+}
+
+type scannerJSON struct {
+	Tool    string `json:"tool"`
+	RuleID  string `json:"rule_id"`
+	Level   string `json:"level"`
+	ID      string `json:"id,omitempty"`
+	Path    string `json:"path,omitempty"`
+	Line    int    `json:"line,omitempty"`
+	Message string `json:"message"`
 }
 
 func nonNil(s []string) []string {

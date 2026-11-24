@@ -82,11 +82,14 @@ var commands = []*command{
 			format := newEnum(fs, "format", "text", "output format", "text", "json", "sarif")
 			scope := newEnum(fs, "scope", "auto", "scopes to verify; auto means every scope that has a lockfile", "auto", "user", "project", "all")
 			verbose := fs.Bool("verbose", false, "also list unchanged entries")
+			scan := stringsFlag{}
+			fs.Var(&scan, "scanner-sarif", "SARIF from an external scanner to attach to entries (repeatable; informational, LW-FR-16)")
 			o := locFlags(fs, true)
 			return func(e *env, args []string) error {
 				if err := noArgs(args); err != nil {
 					return err
 				}
+				o.scanner = scan
 				return runVerify(e, o, scope.String(), format.String(), *frozen, *verbose)
 			}
 		},
@@ -158,6 +161,8 @@ var commands = []*command{
 		define: func(fs *flag.FlagSet) action {
 			format := newEnum(fs, "format", "text", "output format", "text", "json", "sarif")
 			pol := fs.String("policy", "", "policy file to apply (the repository's own policy is never used)")
+			scan := stringsFlag{}
+			fs.Var(&scan, "scanner-sarif", "SARIF from an external scanner to attach to items (repeatable; informational, LW-FR-16)")
 			return func(e *env, args []string) error {
 				if len(args) != 1 {
 					return exitcode.New(exitcode.Usage, "requires exactly one repository path, got %d", len(args))
@@ -165,7 +170,7 @@ var commands = []*command{
 				if err := nonEmpty(args); err != nil {
 					return err
 				}
-				return runScanRepo(e, args[0], format.String(), *pol)
+				return runScanRepo(e, args[0], format.String(), *pol, scan)
 			}
 		},
 	},
@@ -234,6 +239,20 @@ type locations struct {
 	root, home, userLock, policy *string
 	maxFiles                     *int
 	tools                        toolsFlag
+	scanner                      stringsFlag
+}
+
+// stringsFlag collects a repeatable string flag.
+type stringsFlag []string
+
+func (s *stringsFlag) String() string { return strings.Join(*s, ",") }
+
+func (s *stringsFlag) Set(v string) error {
+	if v == "" {
+		return errors.New("empty value")
+	}
+	*s = append(*s, v)
+	return nil
 }
 
 func locFlags(fs *flag.FlagSet, full bool) *locations {
@@ -383,6 +402,13 @@ func scopeConfig(o *locations, scope asset.Scope) (engine.Config, error) {
 			return c, exitcode.New(exitcode.Usage, "--policy %s: %v", p, err)
 		}
 		c.PolicyPath = abs
+	}
+	for _, f := range o.scanner {
+		abs, err := filepath.Abs(f)
+		if err != nil {
+			return c, exitcode.New(exitcode.Usage, "--scanner-sarif: %v", err)
+		}
+		c.ScannerSARIF = append(c.ScannerSARIF, abs)
 	}
 	c.DisplayLockfile = display(c.Lockfile, home)
 	c.DisplayPolicy = display(c.PolicyPath, home)
@@ -760,7 +786,7 @@ func plural(n int, one, many string) string {
 	return many
 }
 
-func runScanRepo(e *env, target, format, pol string) error {
+func runScanRepo(e *env, target, format, pol string, scan []string) error {
 	info, err := os.Stat(target)
 	if err != nil || !info.IsDir() {
 		return exitcode.New(exitcode.Usage, "%s is not a directory", target)
@@ -770,7 +796,12 @@ func runScanRepo(e *env, target, format, pol string) error {
 			return exitcode.New(exitcode.Usage, "--policy: %v", err)
 		}
 	}
-	r, err := repo.Scan(e.ctx, target, pol)
+	for i, f := range scan {
+		if scan[i], err = filepath.Abs(f); err != nil {
+			return exitcode.New(exitcode.Usage, "--scanner-sarif: %v", err)
+		}
+	}
+	r, err := repo.Scan(e.ctx, target, pol, scan...)
 	if err != nil {
 		return err
 	}

@@ -130,7 +130,8 @@
       ],
       "notices": [
         "tools fingerprint for mcp:cursor:gh not re-checked (pass --tools)"
-      ]
+      ],
+      "scanner_findings": []
     }
   ]
 }

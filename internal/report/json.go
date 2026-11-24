@@ -41,6 +41,17 @@ type jsonScope struct {
 	Suppressed     int           `json:"suppressed"`
 	Problems       []jsonProblem `json:"problems"`
 	Notices        []string      `json:"notices"`
+	Scanner        []jsonScanner `json:"scanner_findings"`
+}
+
+type jsonScanner struct {
+	Tool    string `json:"tool"`
+	RuleID  string `json:"rule_id"`
+	Level   string `json:"level"`
+	ID      string `json:"id,omitempty"`
+	Path    string `json:"path,omitempty"`
+	Line    int    `json:"line,omitempty"`
+	Message string `json:"message"`
 }
 
 type jsonPolicy struct {
@@ -111,6 +122,10 @@ func JSON(w io.Writer, r *Report) error {
 		}
 		for _, p := range s.Problems {
 			js.Problems = append(js.Problems, jsonProblem(p))
+		}
+		js.Scanner = []jsonScanner{}
+		for _, f := range s.Scanner {
+			js.Scanner = append(js.Scanner, jsonScanner{Tool: f.Tool, RuleID: f.RuleID, Level: f.Level, ID: f.EntryID, Path: f.URI, Line: f.Line, Message: f.Message})
 		}
 		out.Scopes = append(out.Scopes, js)
 	}

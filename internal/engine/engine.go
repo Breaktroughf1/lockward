@@ -18,6 +18,7 @@ import (
 	"github.com/Breaktroughf1/lockward/internal/lock"
 	"github.com/Breaktroughf1/lockward/internal/policy"
 	"github.com/Breaktroughf1/lockward/internal/report"
+	"github.com/Breaktroughf1/lockward/internal/scanner"
 	"github.com/Breaktroughf1/lockward/internal/snapshot"
 	"github.com/Breaktroughf1/lockward/internal/tools"
 )
@@ -35,6 +36,7 @@ type Config struct {
 	MaxMembers      int
 	MaxWalkEntries  int
 	Snapshots       *snapshot.Store // nil disables snapshots
+	ScannerSARIF    []string        // external scanner SARIF files to import (LW-FR-16)
 }
 
 func (c Config) generatedBy() string { return "lockward " + c.Version }
@@ -220,6 +222,9 @@ func Verify(ctx context.Context, c Config, frozen bool) (report.Scope, exitcode.
 	if live.Ignore != nil {
 		s.IgnorePatterns = live.Ignore.Patterns
 	}
+	if s.Scanner, err = ImportScanner(c.ScannerSARIF, c.Root, live.Entries); err != nil {
+		return report.Scope{}, exitcode.Usage, err
+	}
 	code := exitcode.Clean
 	switch {
 	case lock.Drift(s.Results, frozen):
@@ -310,4 +315,21 @@ func storeSnapshots(c Config, live *Live, entries []asset.Entry) []string {
 		return []string{fmt.Sprintf("could not save %d snapshot(s) to %s; 'lockward diff' will show file-level changes only", failed, c.Snapshots.Dir)}
 	}
 	return nil
+}
+
+// ImportScanner loads external scanner SARIF files and attaches their
+// findings to entries (LW-FR-16). The findings never affect exit codes.
+func ImportScanner(files []string, root string, entries []asset.Entry) ([]scanner.Finding, error) {
+	var all []scanner.Finding
+	for _, f := range files {
+		fs, err := scanner.Load(f, root)
+		if err != nil {
+			return nil, usage("--scanner-sarif: %v", err)
+		}
+		all = append(all, fs...)
+	}
+	if len(all) == 0 {
+		return nil, nil
+	}
+	return scanner.Attach(all, entries), nil
 }

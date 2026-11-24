@@ -602,3 +602,38 @@ func TestInvariant_OutputCannotInjectTerminalOrCICommands(t *testing.T) {
 	check("diff", runCLI("diff", "--scope", "project", "--root", root))
 	check("approve", runCLI("approve", "--all", "--root", root))
 }
+
+// TestScannerSARIFImport covers LW-FR-16: external scanner findings attach to
+// entries, are shown in text and JSON, and never change the exit code.
+func TestScannerSARIFImport(t *testing.T) {
+	p := newProject(t)
+	p.mustCode(clean, "lock", "--scope", "project")
+	before := p.run("verify", "--scope", "project")
+	sarif := filepath.Join(t.TempDir(), "scanner.sarif")
+	write(t, filepath.Dir(sarif), map[string]string{filepath.Base(sarif): `{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"SkillSpector"}},"results":[
+		{"ruleId":"SS-EXFIL","level":"error","message":{"text":"Uploads files"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":".claude/skills/fmt/run.sh"},"region":{"startLine":2}}}]},
+		{"ruleId":"SS-OTHER","level":"warning","message":{"text":"Unrelated"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"src/x.go"}}}]}]}]}`})
+	r := p.run("verify", "--scope", "project", "--scanner-sarif", sarif)
+	if r.code != before.code {
+		t.Errorf("imported findings changed the exit code: %d -> %d", before.code, r.code)
+	}
+	for _, want := range []string{"scanner findings (imported", "SkillSpector SS-EXFIL  skill:claude-code:fmt", "at .claude/skills/fmt/run.sh:2", "point outside every pinned asset"} {
+		if !strings.Contains(r.stdout, want) {
+			t.Errorf("verify output missing %q:\n%s", want, r.stdout)
+		}
+	}
+	r = p.run("verify", "--scope", "project", "--format", "json", "--scanner-sarif", sarif)
+	if !strings.Contains(r.stdout, `"rule_id": "SS-EXFIL"`) || !strings.Contains(r.stdout, `"id": "skill:claude-code:fmt"`) {
+		t.Errorf("json output:\n%s", r.stdout)
+	}
+	sr := runCLI("scan-repo", p.root, "--scanner-sarif", sarif)
+	if !strings.Contains(sr.stdout, "SS-EXFIL  skill:claude-code:fmt") {
+		t.Errorf("scan-repo output:\n%s", sr.stdout)
+	}
+	bad := filepath.Join(t.TempDir(), "bad.sarif")
+	write(t, filepath.Dir(bad), map[string]string{filepath.Base(bad): `{"version":"1.0"}`})
+	p.mustCode(usage, "verify", "--scope", "project", "--scanner-sarif", bad)
+	if r := runCLI("scan-repo", p.root, "--scanner-sarif", bad); r.code != usage {
+		t.Errorf("scan-repo bad sarif exit %d", r.code)
+	}
+}

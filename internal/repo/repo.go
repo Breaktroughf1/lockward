@@ -23,6 +23,7 @@ import (
 	"github.com/Breaktroughf1/lockward/internal/discover"
 	"github.com/Breaktroughf1/lockward/internal/exitcode"
 	"github.com/Breaktroughf1/lockward/internal/policy"
+	"github.com/Breaktroughf1/lockward/internal/scanner"
 	"github.com/Breaktroughf1/lockward/internal/textscan"
 )
 
@@ -51,6 +52,7 @@ type Result struct {
 	PolicyFile        string // user-supplied policy, if any
 	PolicyDigest      string
 	ExitCode          exitcode.Code
+	Scanner           []scanner.Finding // imported, informational (LW-FR-16)
 }
 
 // maxURLs bounds the hosts listed per item.
@@ -58,7 +60,7 @@ const maxURLs = 20
 
 // Scan inspects root. policyPath may be empty for the built-in policy; it
 // must never be the scanned repository's own policy file.
-func Scan(ctx context.Context, root, policyPath string) (*Result, error) {
+func Scan(ctx context.Context, root, policyPath string, scannerSARIF ...string) (*Result, error) {
 	res, err := discover.Run(ctx, discover.Options{Root: root, Scope: asset.ScopeProject, NoIgnore: true})
 	if err != nil {
 		if errors.Is(err, discover.ErrConfig) {
@@ -96,6 +98,17 @@ func Scan(ctx context.Context, root, policyPath string) (*Result, error) {
 			return nil, err
 		}
 		out.Items = append(out.Items, it)
+	}
+	var imported []scanner.Finding
+	for _, f := range scannerSARIF {
+		fs, err := scanner.Load(f, res.Root)
+		if err != nil {
+			return nil, exitcode.New(exitcode.Usage, "--scanner-sarif: %v", err)
+		}
+		imported = append(imported, fs...)
+	}
+	if len(imported) > 0 {
+		out.Scanner = scanner.Attach(imported, res.Entries)
 	}
 	if pr.Errors() > 0 {
 		out.ExitCode = exitcode.Policy
