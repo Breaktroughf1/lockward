@@ -1,6 +1,8 @@
 package prose
 
 import (
+	"math"
+	"math/big"
 	"slices"
 	"strings"
 	"testing"
@@ -103,4 +105,17 @@ func FuzzDiff(f *testing.F) {
 			t.Fatalf("diff does not reconstruct inputs")
 		}
 	})
+}
+
+func TestTooLargeMatchesExactProduct(t *testing.T) {
+	vals := []int{1, 2, 1998, 1999, 2000, 2001, maxCells / 2, maxCells - 1, maxCells, maxCells + 1, math.MaxInt32, math.MaxInt - 1}
+	limit := big.NewInt(maxCells)
+	for _, n := range vals {
+		for _, m := range vals {
+			p := new(big.Int).Mul(big.NewInt(int64(n)+1), big.NewInt(int64(m)+1))
+			if want := p.Cmp(limit) > 0; tooLarge(n, m) != want {
+				t.Errorf("tooLarge(%d, %d) = %v, want %v", n, m, !want, want)
+			}
+		}
+	}
 }

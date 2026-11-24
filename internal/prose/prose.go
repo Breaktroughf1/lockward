@@ -83,10 +83,16 @@ func Diff(a, b []string) []Op {
 	return ops
 }
 
+// tooLarge reports whether an (n+1)×(m+1) table exceeds maxCells. The
+// division form cannot overflow, whatever the lengths.
+func tooLarge(n, m int) bool {
+	return n >= maxCells || m+1 > maxCells/(n+1)
+}
+
 func middle(a, b []string) []Op {
 	n, m := len(a), len(b)
-	if n == 0 || m == 0 || (n+1)*(m+1) > maxCells {
-		ops := make([]Op, 0, n+m)
+	if n == 0 || m == 0 || tooLarge(n, m) {
+		var ops []Op
 		for _, s := range a {
 			ops = append(ops, Op{Delete, s})
 		}
