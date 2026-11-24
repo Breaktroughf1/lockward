@@ -127,6 +127,24 @@ Gitignore-style patterns, relative to the scope root: `#` comments, `!` negation
 
 The nested-file search used for `AGENTS.md`, `CLAUDE.md` and similar never enters `.git` or `node_modules`. Files in those directories are still hashed when they are part of a pinned skill.
 
+## Windows and line endings
+
+Lockward pins the exact bytes an agent reads. With Git's `core.autocrlf=true` (the default on Windows), text files are checked out with CRLF line endings, so a Windows checkout really does contain different bytes from the LF files that were locked on Linux or macOS, and `verify` reports them as modified. Keep agent files LF on every OS with `.gitattributes`:
+
+```gitattributes
+CLAUDE.md text eol=lf
+AGENTS.md text eol=lf
+.claude/** text eol=lf
+.cursor/** text eol=lf
+.github/copilot-instructions.md text eol=lf
+.github/instructions/** text eol=lf
+lockward.lock text eol=lf
+lockward.policy.yaml text eol=lf
+.lockwardignore text eol=lf
+```
+
+After adding it, run `git add --renormalize .` once and commit.
+
 ## Snapshots
 
 `lock` and `approve` copy text files of up to 1 MiB that belong to skills and rules entries into `$LOCKWARD_CACHE_DIR`, or `<user cache dir>/lockward/objects`, keyed by digest. `diff` uses them to show the previous text. Snapshots stay on your machine and are checked against their digest when read. Without one (for example in CI, or on a different machine) `diff` shows file-level changes and the new text only.

@@ -2,3 +2,13 @@
 testdata/** -text
 **/testdata/** -text
 *.go text eol=lf
+
+# Agent instruction files and Lockward's own files are pinned byte-for-byte.
+# Keep them LF on every OS so a Windows checkout (core.autocrlf) does not
+# show drift against a lockfile created on Linux or macOS.
+CLAUDE.md text eol=lf
+AGENTS.md text eol=lf
+.claude/** text eol=lf
+lockward.lock text eol=lf
+lockward.policy.yaml text eol=lf
+.lockwardignore text eol=lf
