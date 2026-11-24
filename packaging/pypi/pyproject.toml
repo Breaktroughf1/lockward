@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools==84.2.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lockward"
+version = "0.0.0"
+description = "Lockfile and policy gate for AI agent skills, MCP servers, hooks and rules (runs the signed Lockward binary)"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+authors = [{ name = "Breaktrough" }]
+keywords = ["ai-security", "supply-chain-security", "mcp", "claude-code", "lockfile", "sbom", "sarif"]
+classifiers = [
+  "Environment :: Console",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/Breaktroughf1/lockward"
+Source = "https://github.com/Breaktroughf1/lockward"
+Issues = "https://github.com/Breaktroughf1/lockward/issues"
+
+[project.scripts]
+lockward = "lockward.__main__:main"
+
+[tool.setuptools.package-data]
+lockward = ["py.typed"]

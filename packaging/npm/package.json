@@ -1,0 +1,45 @@
+{
+  "name": "lockward",
+  "version": "0.0.0",
+  "description": "Lockfile and policy gate for AI agent skills, MCP servers, hooks and rules (installs the signed Lockward binary)",
+  "keywords": [
+    "ai-security",
+    "supply-chain-security",
+    "mcp",
+    "claude-code",
+    "cursor",
+    "agent-skills",
+    "lockfile",
+    "sbom",
+    "sarif"
+  ],
+  "homepage": "https://github.com/Breaktroughf1/lockward",
+  "bugs": "https://github.com/Breaktroughf1/lockward/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Breaktroughf1/lockward.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Breaktrough (https://breaktroughf1.com)",
+  "bin": {
+    "lockward": "bin/lockward.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}
