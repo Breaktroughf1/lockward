@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.2.0] - 2026-11-24
 
 ### Security
 - **Drift in unmodelled fields:** changing a field Lockward did not record, such as an MCP server's `headersHelper` command, a hook's `if` condition or a project settings command, was not reported. Every field of MCP server and hook definitions is now pinned (redacted), and project-scope config files are pinned in full. **After upgrading, review `lockward verify` and run `lockward approve --all`**: entries whose definitions have extra fields get new digests.
@@ -15,6 +15,9 @@ All notable changes to this project are documented here. The format follows [Kee
 - `--scanner-sarif` on `verify` and `scan-repo` imports external scanner findings and attaches them to entries (LW-FR-16). They are informational and never change the exit code.
 - `lock` warns when it pins personal `*.local.*` files into the shared lockfile.
 - CI: govulncheck and new fuzz targets.
+
+### Changed
+- The GitHub Action installs 0.2.0 by default.
 
 ### Fixed
 - The Action no longer aborts when Lockward's output contains no backticks.
@@ -48,5 +51,6 @@ First public release.
 - GitHub Action that verifies the release's Sigstore signature and checksum before running.
 - Reproducible release builds for Linux, macOS and Windows on amd64 and arm64, with a cosign-signed `checksums.txt` and SLSA build provenance.
 
+[0.2.0]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.1.0

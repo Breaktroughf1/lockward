@@ -63,9 +63,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@<sha>
-      - uses: Breaktroughf1/lockward/action@<sha>   # pin to the v0.1.1 commit
+      - uses: Breaktroughf1/lockward/action@<sha>   # pin to the v0.2.0 commit
         with:
-          version: 0.1.1
+          version: 0.2.0
           args: verify --frozen
 ```
 
@@ -101,10 +101,10 @@ Exit codes: `0` clean, `1` drift, `2` policy violation, `3` usage or configurati
 
   ```sh
   cosign verify-blob --bundle checksums.txt.sigstore.json \
-    --certificate-identity "https://github.com/Breaktroughf1/lockward/.github/workflows/release.yml@refs/tags/v0.1.1" \
+    --certificate-identity "https://github.com/Breaktroughf1/lockward/.github/workflows/release.yml@refs/tags/v0.2.0" \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com checksums.txt
   sha256sum --ignore-missing -c checksums.txt
-  gh attestation verify lockward_0.1.1_linux_amd64.tar.gz --repo Breaktroughf1/lockward
+  gh attestation verify lockward_0.2.0_linux_amd64.tar.gz --repo Breaktroughf1/lockward
   ```
 
 ## Trust properties

@@ -15,16 +15,16 @@ jobs:
       - uses: actions/checkout@<sha>
         with:
           persist-credentials: false
-      - uses: Breaktroughf1/lockward/action@<commit sha of v0.1.1>
+      - uses: Breaktroughf1/lockward/action@<commit sha of v0.2.0>
         with:
-          version: 0.1.1
+          version: 0.2.0
 ```
 
 ## Inputs
 
 | Input | Default | Description |
 |---|---|---|
-| `version` | `0.1.1` | Release to install, without the leading `v` |
+| `version` | `0.2.0` | Release to install, without the leading `v` |
 | `args` | `verify --frozen` | Arguments passed to `lockward` |
 | `sarif` | `true` | For `verify`, also upload a SARIF report to code scanning (needs `security-events: write`) |
 | `working-directory` | `.` | Directory to run in |
