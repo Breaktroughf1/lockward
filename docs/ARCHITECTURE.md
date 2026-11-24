@@ -124,7 +124,7 @@ Release checklist, after `vX.Y.Z` is tagged here and the release workflow passes
 2. Copy `action/action.yml`, `install.sh` and `run.sh` to `lockward-action`, commit with sign-off, tag the same `vX.Y.Z`, and create its release (tick "Publish this Action to the GitHub Marketplace").
 3. Point `action-test.yml` (the `remote-ref` and `marketplace` jobs) at the new commits and confirm it passes on every runner.
 4. The Homebrew tap updates itself within three hours; run its `update` workflow to publish at once.
-5. `container.yml` and `packages.yml` run on the release event. If either was skipped or failed, dispatch it with the tag (`packages.yml` also needs `publish=true`).
+5. Dispatch `container.yml` and `packages.yml` with the tag (`packages.yml` also needs `publish=true` to publish). The release event does not start them, because `release.yml` creates the release with its own `GITHUB_TOKEN`, which never triggers other workflows.
 
 - Distribution: GitHub Releases, `go install`, and the Homebrew tap [Breaktroughf1/homebrew-tap](https://github.com/Breaktroughf1/homebrew-tap). The tap needs no token: a scheduled workflow there verifies each release's `checksums.txt` with Sigstore (identity: this repository's `release.yml` at the tag), regenerates the formula from it, installs and tests it with Homebrew, and only then commits with its own `GITHUB_TOKEN`.
 - Container: `container.yml` downloads the release archives, verifies `checksums.txt` with Sigstore, builds `ghcr.io/breaktroughf1/lockward` for linux/amd64 and linux/arm64 on a digest-pinned distroless non-root base, then signs it with cosign, attests build provenance and smoke-tests the pushed digest.
