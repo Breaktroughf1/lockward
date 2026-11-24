@@ -1,4 +1,6 @@
-# Lockward GitHub Action
+# Lockward GitHub Action (development copy)
+
+The published action is [Breaktroughf1/lockward-action](https://github.com/Breaktroughf1/lockward-action), which the GitHub Marketplace lists. This directory is where the action is developed and tested; at each release its files are copied there (see docs/ARCHITECTURE.md §7). Use the published repository in your workflows.
 
 Runs `lockward` in CI and fails the job when AI-agent assets drift from `lockward.lock` or break your policy.
 
@@ -15,7 +17,7 @@ jobs:
       - uses: actions/checkout@<sha>
         with:
           persist-credentials: false
-      - uses: Breaktroughf1/lockward/action@<commit sha of v0.2.0>
+      - uses: Breaktroughf1/lockward-action@126b1debbad46a5ccf2b249f540b1b4993eab153 # v0.2.0
         with:
           version: 0.2.0
 ```

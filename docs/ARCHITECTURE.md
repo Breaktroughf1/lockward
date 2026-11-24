@@ -116,5 +116,12 @@ CycloneDX and SARIF are emitted from small local structs instead of SDKs. No dep
 
 - GoReleaser: linux/darwin/windows × amd64/arm64, `CGO_ENABLED=0`, `-trimpath`, commit-time `mod_timestamp`, source archive.
 - `checksums.txt` signed keylessly with cosign (Sigstore bundle), SLSA build provenance via `actions/attest-build-provenance`.
-- The GitHub Action verifies the Sigstore identity (`release.yml` at the release tag) and the archive checksum before running the binary.
+- The GitHub Action verifies the Sigstore identity (`release.yml` at the release tag) and the archive checksum before running the binary. It is developed in `action/` and published from [Breaktroughf1/lockward-action](https://github.com/Breaktroughf1/lockward-action), whose root `action.yml` the Marketplace requires (that repository holds no workflows; it is tested from this repository's `action-test.yml`).
+
+Release checklist, after `vX.Y.Z` is tagged here and the release workflow passes:
+
+1. Bump the default `version` in `action/action.yml` (and the READMEs) before tagging, as for v0.2.0.
+2. Copy `action/action.yml`, `install.sh` and `run.sh` to `lockward-action`, commit with sign-off, tag the same `vX.Y.Z`, and create its release (tick "Publish this Action to the GitHub Marketplace").
+3. Point `action-test.yml` (the `remote-ref` and `marketplace` jobs) at the new commits and confirm it passes on every runner.
+4. The Homebrew tap updates itself within three hours; run its `update` workflow to publish at once.
 - Distribution: GitHub Releases, `go install`, and the Homebrew tap [Breaktroughf1/homebrew-tap](https://github.com/Breaktroughf1/homebrew-tap). The tap needs no token: a scheduled workflow there verifies each release's `checksums.txt` with Sigstore (identity: this repository's `release.yml` at the tag), regenerates the formula from it, installs and tests it with Homebrew, and only then commits with its own `GITHUB_TOKEN`. npm and PyPI wrappers are planned.

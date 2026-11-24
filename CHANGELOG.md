@@ -5,6 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Added
+- GitHub Action published from [Breaktroughf1/lockward-action](https://github.com/Breaktroughf1/lockward-action) (root `action.yml`, for the Marketplace), tested from this repository on Linux, macOS and Windows.
 - Homebrew: `brew install breaktroughf1/tap/lockward` on macOS and Linux (Intel and ARM). The tap's formula is generated from each release's Sigstore-verified checksums, with no shared token.
 
 ## [0.2.0] - 2026-11-24

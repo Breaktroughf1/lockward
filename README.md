@@ -63,13 +63,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@<sha>
-      - uses: Breaktroughf1/lockward/action@<sha>   # pin to the v0.2.0 commit
+      - uses: Breaktroughf1/lockward-action@126b1debbad46a5ccf2b249f540b1b4993eab153 # v0.2.0
         with:
           version: 0.2.0
           args: verify --frozen
 ```
 
-The action downloads the release, verifies its Sigstore signature and checksum before running it, writes a job summary, and uploads SARIF so each drifted item and policy finding shows up in code scanning. See [action/README.md](action/README.md).
+The action downloads the release, verifies its Sigstore signature and checksum before running it, writes a job summary, and uploads SARIF so each drifted item and policy finding shows up in code scanning. See [Breaktroughf1/lockward-action](https://github.com/Breaktroughf1/lockward-action).
 
 ## What it does
 
