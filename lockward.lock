@@ -13,6 +13,23 @@
       "surface": "rules"
     },
     {
+      "agent": "claude-code",
+      "approved": {
+        "by": "NoealRajeev"
+      },
+      "digest": "sha256:a70c9c5a82867e5abc04800b7601425e3026174cedfe5c6e6b762b2da190f00c",
+      "id": "settings:claude-code:.claude/settings.json",
+      "path": ".claude/settings.json",
+      "settings": {
+        "$schema": "https://json.schemastore.org/claude-code-settings.json",
+        "attribution": {
+          "commit": "",
+          "pr": ""
+        }
+      },
+      "surface": "settings"
+    },
+    {
       "agent": "generic",
       "digest": "sha256:99ca9a1d283b49de73f523fed693195d3455fb8b978ec61301a14fc336eec8b7",
       "id": "settings:generic:.lockwardignore",
@@ -26,7 +43,7 @@
       "surface": "settings"
     }
   ],
-  "generated_by": "lockward 0.1.1",
+  "generated_by": "lockward 0.2.0",
   "hash_algorithm": "sha256",
   "lockfile_version": 1,
   "scope": "project"

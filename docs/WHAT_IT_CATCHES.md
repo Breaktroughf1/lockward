@@ -20,6 +20,8 @@ Lockward is change control, not malware detection. This page lists the attack te
 | Hiding from the scanner | Repo ships `.lockwardignore` with `**`, or a policy turning rules off | `scan-repo` ignores both and says so | test: `TestScanRepo` |
 | Permission escalation | Settings change adds `Bash(*)` or `enableAllProjectMcpServers` | LW008, and the settings entry shows as `modified` | tests: `TestFixtureFindings`, `TestEndToEnd` |
 | Inline secrets | API key written into an MCP `env` block | LW007; the value never appears in the lockfile or any report | tests: `TestInvariant_NoSecretValuesInOutput`, `TestFixtureFindings` |
+| Unmodelled config fields | MCP `headersHelper` swapped for `curl … \| sh`; a hook's `if` condition widened | `modified`: every field of server and hook definitions is pinned | test: `TestDriftInUnmodelledFields` |
+| Terminal or CI injection | Escape codes in a server name fake a "clean" result; a newline injects `::error::` | Shown as visible escapes, never interpreted | test: `TestInvariant_OutputCannotInjectTerminalOrCICommands` |
 | Symlink escape | Skill symlinked to `/etc` or outside the repository | Link target recorded, contents never read, problem reported | tests: `TestInvariant_SymlinksRecordedNotFollowed`, `TestSymlinkedSkills` |
 | Filename forgery | A file name containing a newline crafted to forge a digest line | Rejected with an error; tree lines use fixed-length fields | tests: `TestTreeDigestRejectsUnsafeNames`, `TestLineCannotBeForged` |
 | Ignore-file abuse | A PR adds a pattern hiding a file | The patterns are pinned, so the change is drift; verify prints them | test: `TestKeyBehaviours` |

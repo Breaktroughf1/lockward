@@ -74,6 +74,19 @@ jobs:
       - name: Run tests without network
         run: sudo unshare -n -- env "PATH=$PATH" "HOME=$HOME" GOFLAGS=-mod=mod GOPROXY=off GOTOOLCHAIN=local go test -count=1 ./...
 
+  govulncheck:
+    name: known vulnerabilities (govulncheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        with:
+          go-version-file: go.mod
+      - name: govulncheck (pinned)
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test ./...
+
   fuzz:
     runs-on: ubuntu-latest
     steps:
@@ -93,7 +106,9 @@ jobs:
             "./internal/ignore FuzzParse" \
             "./internal/prose FuzzDiff" \
             "./internal/redact FuzzRedactNeverLeaksToken" \
-            "./internal/adapter FuzzConfigParsers"; do
+            "./internal/adapter FuzzConfigParsers" \
+            "./internal/report FuzzSafe" \
+            "./internal/scanner FuzzParse"; do
             set -- $target
             go test "$1" -run '^$' -fuzz "^$2\$" -fuzztime 20s
           done

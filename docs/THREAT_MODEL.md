@@ -39,7 +39,15 @@ The integrity of the **agent layer**: the skills, MCP server definitions, hooks 
 | T10 | **Secret leakage via Lockward output** | Env values, headers or tokens written to lockfile/SARIF | Store env/header **names** only (SPEC §4.2); secret-looking arguments, URL credentials and settings values are replaced with `[REDACTED]` before storing or hashing; LW007 flags inline secrets by location only | Secrets in formats the redaction patterns do not recognise |
 | T11 | **Compromised Lockward release** | Malicious binary or Action | SHA-pinned workflows, minimal deps, reproducible builds, checksums + Sigstore + SLSA provenance; Action verifies binary checksum (LW-FR-14) | Maintainer account compromise; require 2FA and protected tags |
 | T12 | **Denial of service in CI** | Asset tree of millions of files; a FIFO that blocks readers | Limits per skill (`--max-files`, default 200 000) and per project walk (2 000 000 entries) fail loudly, never silently skip; special files are recorded and never opened | — |
+| T14 | **Output injection** | Repo content with terminal escape sequences, newlines or bidi controls fakes a "clean" result, injects GitHub workflow commands (`::error::`) or disguises text | All text output passes through `report.Safe`, which shows control, bidi and invisible characters as visible escapes; the Action suspends workflow commands around Lockward's output and sizes the job-summary fence to its content (`TestInvariant_OutputCannotInjectTerminalOrCICommands`) | JSON and SARIF consumers must escape strings themselves when rendering HTML |
+| T15 | **Drift in unmodelled fields** | Attacker changes a config field Lockward did not record (an MCP `headersHelper` command, a hook `if` condition) | Every field of MCP server and hook objects is pinned in `options`; project-scope config files are pinned in full (`TestDriftInUnmodelledFields`) | User-scope settings files pin a security-relevant subset to avoid constant churn |
 | T13 | **Ignore-file abuse** | Attacker adds `.lockwardignore` to hide a file | Ignore patterns are themselves pinned and printed on every `verify` | — |
+
+### Residual risks
+
+- **FIFO race:** a file is stat'ed before it is opened so FIFOs and devices are never read, but a local attacker who swaps a file for a FIFO between those two calls can stall the run. This needs a concurrent local attacker; CI runners are not exposed to it.
+- **Policy and lockfile in the same PR:** a pull request can edit `lockward.lock` or `lockward.policy.yaml` together with an asset (T6, T7). Protect both with CODEOWNERS and required reviews; `verify` prints the policy digest so a change is visible.
+- **Imported scanner findings** (LW-FR-16) are untrusted input: they are displayed (neutralised) and never change the exit code.
 
 ## 5. Explicit non-goals
 

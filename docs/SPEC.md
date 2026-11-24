@@ -103,7 +103,7 @@ A shared file is pinned once. Its owner is the agent whose documentation defines
 }
 ```
 
-`server` fields: `transport` (`stdio` · `http` · `sse` · `ws`), `command`, `args`, `cwd`, `package` (`ecosystem` npm/pypi/oci, `name`, exact `version` if pinned, OCI `digest` if pinned, raw `spec`), `url`, `env_keys`, `header_keys`, `trust` (Gemini CLI), `approval_mode` (Codex `default_tools_approval_mode`), `disabled`.
+`server` fields: `transport` (`stdio` · `http` · `sse` · `ws`), `command`, `args`, `cwd`, `package` (`ecosystem` npm/pypi/oci, `name`, exact `version` if pinned, OCI `digest` if pinned, raw `spec`), `url`, `env_keys`, `header_keys`, `trust` (Gemini CLI), `approval_mode` (Codex `default_tools_approval_mode`), `disabled`, and `options`: every other field of the server definition (for example `headersHelper`, `oauth`, `tools`, `timeout`), so that a change to any field changes the digest. `options` values are redacted the same way, and any object under a key named `env`, `environment`, `headers`, `http_headers` or `env_http_headers` is reduced to `{ "keys": [<sorted names>] }`.
 
 Environment and header **values** MUST NOT be stored, only their names. Secret-looking command-line arguments, URL credentials and URL query values under sensitive names MUST be replaced with `[REDACTED]` before the object is stored or hashed. As a consequence, a change to a redacted secret alone is not drift; policy rule LW007 flags inline secrets instead.
 
@@ -121,7 +121,7 @@ Environment and header **values** MUST NOT be stored, only their names. Secret-l
 }
 ```
 
-One entry per hook handler. `hook` fields: `event`, `matcher`, `type`, `command`, `bash`, `powershell`, `exec`, `args`, `shell`, `cwd`, `url`, `prompt`, `server`, `tool` (redacted like §4.2). If a hook command references a regular file inside the scope root, that file MUST be pinned in `referenced_files`. References are resolved from path-like tokens, with `$CLAUDE_PROJECT_DIR`, `$GEMINI_PROJECT_DIR`, `$CURSOR_PROJECT_DIR`, `${workspaceFolder}` and `$PWD` meaning the project root, and `~`, `$HOME` meaning the user-scope root.
+One entry per hook handler. `hook` fields: `event`, `matcher`, `type`, `command`, `bash`, `powershell`, `exec`, `args`, `shell`, `cwd`, `url`, `prompt`, `server`, `tool`, and `options` holding every other field of the handler (for example an `if` condition or `timeout`), all redacted like §4.2. If a hook command references a regular file inside the scope root, that file MUST be pinned in `referenced_files`. References are resolved from path-like tokens, with `$CLAUDE_PROJECT_DIR`, `$GEMINI_PROJECT_DIR`, `$CURSOR_PROJECT_DIR`, `${workspaceFolder}` and `$PWD` meaning the project root, and `~`, `$HOME` meaning the user-scope root.
 
 ### 4.4 `rules`
 
@@ -144,7 +144,7 @@ Rules and instruction files, prompt files, commands, custom agents and workflows
 }
 ```
 
-The security-relevant subset of an agent config file: permission and approval settings, trust lists, and settings that change which files load or which commands run. The keys kept per agent are listed in each adapter's README. Any object under a key named `env` is reduced to `{ "keys": [<sorted names>] }`, and string values are redacted as in §4.2. No entry is written when none of the keys is present.
+For project-scope config files (committed and reviewed), the whole file except the parts pinned as separate `mcp` or `hook` entries. For user-scope files, which agents rewrite constantly, the security-relevant subset: permission and approval settings, trust lists, and settings that change which files load or which commands run (listed in each adapter's README). VS Code `settings.json` is always reduced to its `chat.*` keys. Objects under `env`-like and header keys are reduced to `{ "keys": [<sorted names>] }`, and string values are redacted as in §4.2. No entry is written when none of the keys is present.
 
 The project's `.lockwardignore` is pinned as `settings:generic:.lockwardignore` with `settings: { "patterns": [<active pattern lines in file order>] }`, so changing what is ignored is itself drift (THREAT_MODEL T13).
 

@@ -1,0 +1,12 @@
+# Changes to the trust anchors and the release pipeline need the owner's
+# review (THREAT_MODEL T6, T7, T11). Enforced when branch protection requires
+# code-owner review.
+*                       @NoealRajeev
+/lockward.lock          @NoealRajeev
+/lockward.policy.yaml   @NoealRajeev
+/.lockwardignore        @NoealRajeev
+/.github/               @NoealRajeev
+/action/                @NoealRajeev
+/.goreleaser.yaml       @NoealRajeev
+/go.mod                 @NoealRajeev
+/go.sum                 @NoealRajeev

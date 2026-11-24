@@ -10,7 +10,10 @@ Verified against upstream docs on **2026-11-23**. When the upstream docs change,
 | Hooks | `.devin/hooks.v1.json` (the file is the events map), `hooks` in `.devin/config.json` / `.devin/config.local.json` / `~/.config/devin/config.json`, legacy `.windsurf/hooks.json`. | cli/extensibility/hooks/overview |
 | Skills | `.devin/skills/*/`, legacy `.windsurf/skills/*/` (project); `~/.config/devin/skills/*/` (user). | desktop/cascade/skills |
 | Rules / workflows | `.windsurfrules`, `.devin/rules/**/*.md`, `.windsurf/rules/**/*.md`, `.devin/global_rules.md`, `.windsurf/global_rules.md`, `AGENTS.local.md`, `AGENT.md`, `.devin/workflows/`, `.windsurf/workflows/` (project); `~/.config/devin/AGENTS.md`, `~/.devin/rules/`, `~/.devin/global_rules.md`, `~/.codeium/windsurf/memories/global_rules.md`, `~/.codeium/windsurf/global_workflows/` (user). | cli/extensibility/rules, desktop/cascade/workflows |
+| Settings | `.devin/config.json` and `.devin/config.local.json`: the whole file except `mcpServers` and `hooks` (project scope); `permissions` only (user scope). | cli/extensibility/mcp/configuration |
 | LW008 | Broad `permissions.allow` entries such as `mcp__*` or `*`. | cli/extensibility/mcp/configuration |
+
+MCP server and hook definitions are pinned with every field (redacted), not only the columns above (SPEC §4.2, §4.3).
 
 ## Known limits
 

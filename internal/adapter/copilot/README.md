@@ -13,6 +13,8 @@ Verified against upstream docs on **2026-11-23**. When the upstream docs change,
 | Settings | VS Code `chat.tools.*`, `chat.mcp.*`, `chat.use*`, `chat.permissions.*`, `chat.defaultConfiguration` and the `chat.*Locations` keys in `.vscode/settings.json` and the user settings file (Linux, macOS and Windows locations). | agents/reference/ai-settings |
 | LW008 | `chat.tools.global.autoApprove: true`, `chat.tools.autoApprove: true`, or a catch-all `chat.tools.terminal.autoApprove` pattern set to `true`. | agents/reference/ai-settings |
 
+MCP server and hook definitions are pinned with every field (redacted), not only the columns above (SPEC §4.2, §4.3).
+
 ## Known limits
 
 - MCP servers configured in a repository's GitHub settings for the Copilot coding agent are not on disk and cannot be pinned.

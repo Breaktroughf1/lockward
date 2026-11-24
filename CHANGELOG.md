@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Security
+- **Drift in unmodelled fields:** changing a field Lockward did not record, such as an MCP server's `headersHelper` command, a hook's `if` condition or a project settings command, was not reported. Every field of MCP server and hook definitions is now pinned (redacted), and project-scope config files are pinned in full. **After upgrading, review `lockward verify` and run `lockward approve --all`**: entries whose definitions have extra fields get new digests.
+- **Output injection:** escape sequences, newlines and bidirectional characters from scanned repositories reached terminals and CI logs raw. All text output now shows them as visible escapes, and the Action suspends GitHub workflow commands around Lockward's output.
+- Header-style secrets such as `X-Api-Key: …` in MCP arguments and hook commands are redacted.
+- The snapshot cache never stores files with credential-like names.
+- `approve` only follows a `.git` file's `gitdir` into git directories.
+
+### Added
+- `--scanner-sarif` on `verify` and `scan-repo` imports external scanner findings and attaches them to entries (LW-FR-16). They are informational and never change the exit code.
+- `lock` warns when it pins personal `*.local.*` files into the shared lockfile.
+- CI: govulncheck and new fuzz targets.
+
+### Fixed
+- The Action no longer aborts when Lockward's output contains no backticks.
+
 ## [0.1.1] - 2026-11-24
 
 ### Added

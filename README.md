@@ -84,6 +84,8 @@ The action downloads the release, verifies its Sigstore signature and checksum b
 | `lockward scan-repo <path>` | Inspect an untrusted repository before opening it in an agent |
 | `lockward bom` | Export a CycloneDX 1.6 AI-BOM |
 
+`verify` and `scan-repo` can also attach findings from external scanners such as SkillSpector, Cisco skill-scanner or Snyk with `--scanner-sarif` (informational; they never change the exit code).
+
 Exit codes: `0` clean, `1` drift, `2` policy violation, `3` usage or configuration error, `4` internal error. Full reference: [docs/USAGE.md](docs/USAGE.md).
 
 **What gets pinned.** Every file in a skill, including dotfiles, binaries and archives, hashed in full however large it is; MCP server definitions (command, arguments, package and version, URL, and environment and header *names*, never values); hooks and the scripts they call; rules and instruction files at any depth; and the settings that grant permissions, such as auto-approval lists. Paths were checked against each agent's documentation on 2026-11-23: [docs/AGENT_PATHS.md](docs/AGENT_PATHS.md).
@@ -110,6 +112,7 @@ Exit codes: `0` clean, `1` drift, `2` policy violation, `3` usage or configurati
 - **Never executes scanned content.** Files are read as bytes; hook commands and MCP launch commands are recorded, never run. Enforced by lint rules and tests.
 - **Offline.** No default code path opens a network connection; CI runs the whole test suite with networking disabled.
 - **No secrets in output.** Environment and header values are reduced to names, and secret-looking arguments are masked before anything is stored or printed.
+- **Safe to print.** Escape sequences and invisible or bidirectional characters from scanned files are shown as visible escapes, so a hostile repository cannot rewrite your terminal or inject CI commands.
 - **Deterministic.** Canonical JSON, sorted entries, no timestamps: locking twice gives byte-identical files on every OS.
 - **Symlinks are recorded, never followed outside the scan root.**
 - **No LLM** anywhere in a pass/fail decision ([ADR-0003](docs/adr/0003-no-llm-in-decision-path.md)).

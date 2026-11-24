@@ -11,6 +11,8 @@ Verified against upstream docs on **2026-11-23**. When the upstream docs change,
 | Hooks | `.cursor/hooks.json` and `~/.cursor/hooks.json` → `hooks.<event>[]`. Project hooks run from the project root, user hooks from `~/.cursor`. | agent/hooks |
 | Rules | `.cursor/rules/**/*.mdc` (plain `.md` there is ignored by Cursor and by this adapter); legacy `.cursorrules`. User rules are not stored on disk. | context/rules |
 
+MCP server and hook definitions are pinned with every field (redacted), not only the columns above (SPEC §4.2, §4.3).
+
 ## Known limits
 
 - No file-based auto-approval setting is documented (the Run Modes page returned 404), so LW008 has nothing to check for Cursor.

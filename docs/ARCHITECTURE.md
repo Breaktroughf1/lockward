@@ -47,7 +47,9 @@ internal/policy/         policy schema, built-in rules, streaming text scans
 internal/prose/          sentence-level diff for Markdown and text
 internal/redact/         secret masking for arguments, URLs and settings
 internal/repo/           scan-repo
-internal/report/         renderers: text, JSON, SARIF 2.1.0, CycloneDX 1.6
+internal/report/         renderers: text, JSON, SARIF 2.1.0, CycloneDX 1.6; Safe() for terminal output
+internal/scanner/        import external scanner SARIF and attach it to entries (LW-FR-16)
+internal/textscan/       block-wise whole-file text scanning with overlap
 internal/snapshot/       content-addressed local snapshots for diff
 internal/tools/          MCP tools/list fingerprints (SPEC §5.4)
 testdata/adapters/       fixture trees per agent (project and user scope, malformed)

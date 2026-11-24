@@ -7,6 +7,10 @@
 - **Drift.** An entry that is `added`, `removed` or `modified` compared with the lockfile.
 - **Policy finding.** A rule from [POLICY.md](POLICY.md) that matched the live state, at `error` or `warning` severity.
 
+## Output safety
+
+Text output shows untrusted characters from scanned files (escape sequences, other control characters, bidirectional and invisible Unicode) as visible escapes such as `\x1b` or `\u{202e}`, so a hostile repository cannot rewrite your terminal or inject CI workflow commands. JSON and SARIF keep the original strings, correctly escaped.
+
 ## Exit codes
 
 | Code | Meaning |
@@ -35,7 +39,7 @@ lockward lock --scope project
 lockward lock --tools mcp:cursor:github=github-tools.json
 ```
 
-Discovers every asset, hashes it and writes the lockfile. Entries whose digest is unchanged keep their `approved` record. A lockfile that exists but cannot be read (corrupt, or from a newer Lockward) is never overwritten. `lock` also saves a local snapshot of small text files so that `diff` can show sentence-level changes later (see [Snapshots](#snapshots)).
+Discovers every asset, hashes it and writes the lockfile. When it pins personal files that are normally gitignored (such as `CLAUDE.local.md` or `.claude/settings.local.json`), it says so: committed, they make CI report "removed" and share personal settings, so add them to `.lockwardignore` if they should stay personal. Entries whose digest is unchanged keep their `approved` record. A lockfile that exists but cannot be read (corrupt, or from a newer Lockward) is never overwritten. `lock` also saves a local snapshot of small text files so that `diff` can show sentence-level changes later (see [Snapshots](#snapshots)).
 
 ### verify
 
@@ -47,6 +51,8 @@ lockward verify --scope project --policy ci-policy.yaml
 ```
 
 Without `--frozen`, modified and removed entries fail and additions are reported but tolerated, which suits local use while you work. With `--frozen`, any difference fails. Use `--frozen` in CI.
+
+External scanner results can be attached with `--scanner-sarif scanner.sarif` (repeatable, LW-FR-16). Each SARIF 2.1.0 result is linked to the entry whose file it names, or the skill directory that contains it, and shown under "scanner findings". Imported findings are informational: they never change the exit code, so no external tool can override a drift or policy result ([ADR-0003](adr/0003-no-llm-in-decision-path.md)). They appear in text and JSON output; upload the scanner's own SARIF to code scanning separately.
 
 Every run prints the policy file and its digest, the active `.lockwardignore` patterns and how many files they hid (THREAT_MODEL T7, T13), and any problems found during discovery, such as a config file that could not be parsed and was pinned as raw bytes instead.
 
@@ -86,6 +92,7 @@ Same checks and exit code as `verify --frozen`, printed as one line.
 lockward scan-repo ./cloned-repo
 lockward scan-repo ./cloned-repo --format json
 lockward scan-repo ./cloned-repo --policy my-policy.yaml
+lockward scan-repo ./cloned-repo --scanner-sarif skillspector.sarif
 ```
 
 Lists every file the supported agents would auto-load from the repository, which agents load it, what it can run or connect to, and the external hosts it references, plus policy findings. Nothing is executed. The repository's own `.lockwardignore` and `lockward.policy.yaml` are ignored, so an untrusted repository cannot hide files or switch rules off; the output says when they were present. Exits 2 if a rule fails at error severity.
@@ -109,6 +116,7 @@ Writes a CycloneDX 1.6 BOM of the lockfile's entries, with SHA-256 hashes, packa
 | `--policy FILE` | same, scan-repo | Policy file to use instead of the default location |
 | `--tools ID=FILE` | lock, verify, diff, approve | MCP `tools/list` response for an entry (repeatable) |
 | `--max-files N` | same | Files per skill before failing (default 200000) |
+| `--scanner-sarif FILE` | verify, scan-repo | External scanner SARIF to attach to entries (repeatable; informational) |
 
 ## MCP tool fingerprints
 
@@ -154,7 +162,7 @@ After adding it, run `git add --renormalize .` once and commit.
 
 ## Snapshots
 
-`lock` and `approve` copy text files of up to 1 MiB that belong to skills and rules entries into `$LOCKWARD_CACHE_DIR`, or `<user cache dir>/lockward/objects`, keyed by digest. `diff` uses them to show the previous text. Snapshots stay on your machine and are checked against their digest when read. Without one (for example in CI, or on a different machine) `diff` shows file-level changes and the new text only.
+`lock` and `approve` copy text files of up to 1 MiB that belong to skills and rules entries (never files with credential-like names such as `.env`, `*.pem` or `id_rsa`) into `$LOCKWARD_CACHE_DIR`, or `<user cache dir>/lockward/objects`, keyed by digest. `diff` uses them to show the previous text. Snapshots stay on your machine and are checked against their digest when read. Without one (for example in CI, or on a different machine) `diff` shows file-level changes and the new text only.
 
 ## Environment
 
