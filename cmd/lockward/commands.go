@@ -47,7 +47,7 @@ var commands = []*command{
 	{
 		name:    "init",
 		usage:   "init [--root DIR]",
-		summary: "Write a default lockward.policy.yaml and .lockwardignore (existing files are left alone).",
+		summary: "Write a default lockward.policy.yaml, .lockwardignore and .gitattributes (existing files are left alone).",
 		define: func(fs *flag.FlagSet) action {
 			o := locFlags(fs, false)
 			return func(e *env, args []string) error {
@@ -455,8 +455,76 @@ func runInit(e *env, o *locations) error {
 		}
 		fmt.Fprintf(e.stdout, "created %s\n", display(p, ""))
 	}
-	fmt.Fprintln(e.stdout, "Next: review the policy, run 'lockward lock', and commit lockward.lock with both files.")
+	if err := initGitattributes(e, root); err != nil {
+		return err
+	}
+	fmt.Fprintln(e.stdout, "Next: review the policy, run 'lockward lock', and commit lockward.lock with these files.")
 	return nil
+}
+
+// gitattributesMarker identifies the block written by init.
+const gitattributesMarker = "# lockward: keep agent files LF"
+
+// gitattributesBlock keeps agent files LF on every OS. Lockward pins raw
+// bytes, and Git's core.autocrlf would otherwise check them out as CRLF on
+// Windows and show drift. "text=auto" lets Git leave binary files (images,
+// bytecode inside skills) untouched; plain "text" would corrupt them.
+const gitattributesBlock = gitattributesMarker + ` on every OS (Lockward pins raw bytes; see docs/USAGE.md)
+CLAUDE.md text=auto eol=lf
+CLAUDE.local.md text=auto eol=lf
+AGENTS.md text=auto eol=lf
+GEMINI.md text=auto eol=lf
+.cursorrules text=auto eol=lf
+.windsurfrules text=auto eol=lf
+.mcp.json text=auto eol=lf
+.claude/** text=auto eol=lf
+.cursor/** text=auto eol=lf
+.codex/** text=auto eol=lf
+.gemini/** text=auto eol=lf
+.agents/** text=auto eol=lf
+.devin/** text=auto eol=lf
+.windsurf/** text=auto eol=lf
+.amazonq/** text=auto eol=lf
+.vscode/mcp.json text=auto eol=lf
+.github/copilot-instructions.md text=auto eol=lf
+.github/instructions/** text=auto eol=lf
+.github/prompts/** text=auto eol=lf
+.github/agents/** text=auto eol=lf
+.github/skills/** text=auto eol=lf
+.github/hooks/** text=auto eol=lf
+lockward.lock text=auto eol=lf
+lockward.policy.yaml text=auto eol=lf
+.lockwardignore text=auto eol=lf
+`
+
+// initGitattributes creates .gitattributes with the LF block when it is
+// missing. An existing file is never modified: init prints the block to add.
+func initGitattributes(e *env, root string) error {
+	p := filepath.Join(root, ".gitattributes")
+	b, err := os.ReadFile(p) //nolint:gosec // .gitattributes in the chosen project root
+	switch {
+	case errors.Is(err, os.ErrNotExist):
+		if err := lock.WriteAtomic(p, []byte(gitattributesBlock), 0o644); err != nil {
+			return exitcode.New(exitcode.Usage, "write %s: %v", p, err)
+		}
+		fmt.Fprintf(e.stdout, "created %s (keeps agent files LF so Windows checkouts do not drift)\n", display(p, ""))
+	case err != nil:
+		return exitcode.New(exitcode.Usage, "read %s: %v", p, err)
+	case strings.Contains(string(b), gitattributesMarker):
+		fmt.Fprintf(e.stdout, "exists, left unchanged: %s (already keeps agent files LF)\n", display(p, ""))
+	default:
+		fmt.Fprintf(e.stdout, "exists, left unchanged: %s\n", display(p, ""))
+		fmt.Fprintf(e.stdout, "  To stop Windows checkouts (core.autocrlf) from showing drift, append these lines,\n  then run 'git add --renormalize .' and commit:\n\n%s\n", indent(gitattributesBlock, "    "))
+	}
+	return nil
+}
+
+func indent(s, prefix string) string {
+	lines := strings.Split(strings.TrimRight(s, "\n"), "\n")
+	for i, l := range lines {
+		lines[i] = prefix + l
+	}
+	return strings.Join(lines, "\n")
 }
 
 const defaultIgnoreFile = `# .lockwardignore: paths Lockward does not pin (gitignore-style patterns).

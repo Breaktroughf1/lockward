@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- `lockward init` also writes a `.gitattributes` that keeps agent files LF on every OS, so Windows checkouts (`core.autocrlf`) do not show drift against lockfiles created on Linux or macOS. An existing `.gitattributes` is never modified; `init` prints the lines to append.
+
+### Fixed
+- Documentation recommended `text eol=lf` for directory globs, which makes Git rewrite line endings in binary files too; it now uses `text=auto eol=lf`.
+
 ## [0.1.0] - 2026-11-24
 
 First public release.

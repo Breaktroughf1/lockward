@@ -479,3 +479,34 @@ func TestMalformedConfigsDoNotCrash(t *testing.T) {
 		}
 	}
 }
+
+// TestInitGitattributes: init creates .gitattributes with the LF block when
+// missing, never modifies an existing file, and recognises its own block.
+func TestInitGitattributes(t *testing.T) {
+	root := t.TempDir()
+	r := runCLI("init", "--root", root)
+	if r.code != clean || !strings.Contains(r.stdout, "created .gitattributes") && !strings.Contains(r.stdout, ".gitattributes (keeps agent files LF") {
+		t.Fatalf("init: %d\n%s%s", r.code, r.stdout, r.stderr)
+	}
+	b, err := os.ReadFile(filepath.Join(root, ".gitattributes"))
+	if err != nil || !strings.Contains(string(b), gitattributesMarker) || !strings.Contains(string(b), ".claude/** text=auto eol=lf") {
+		t.Fatalf(".gitattributes = %q, %v", b, err)
+	}
+	if strings.Contains(string(b), " text eol=lf") {
+		t.Error("plain 'text' would corrupt binary files in skills; use text=auto")
+	}
+	if r := runCLI("init", "--root", root); !strings.Contains(r.stdout, "already keeps agent files LF") {
+		t.Errorf("second init:\n%s", r.stdout)
+	}
+
+	other := t.TempDir()
+	const existing = "*.png binary\n"
+	write(t, other, map[string]string{".gitattributes": existing})
+	r = runCLI("init", "--root", other)
+	if r.code != clean || !strings.Contains(r.stdout, "append these lines") || !strings.Contains(r.stdout, "    CLAUDE.md text=auto eol=lf") {
+		t.Errorf("init with existing .gitattributes:\n%s", r.stdout)
+	}
+	if b, _ := os.ReadFile(filepath.Join(other, ".gitattributes")); string(b) != existing {
+		t.Errorf("existing .gitattributes was modified: %q", b)
+	}
+}

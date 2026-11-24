@@ -25,7 +25,7 @@ Flags may appear before or after positional arguments. `lockward help <command>`
 
 ### init
 
-Writes `lockward.policy.yaml` (all rules at their defaults, with comments) and an empty `.lockwardignore` in the project root. Existing files are never overwritten.
+Writes `lockward.policy.yaml` (all rules at their defaults, with comments), an empty `.lockwardignore`, and a `.gitattributes` that keeps agent files LF on every OS (see [Windows and line endings](#windows-and-line-endings)) in the project root. Existing files are never modified: if `.gitattributes` already exists without Lockward's block, `init` prints the lines to append.
 
 ### lock
 
@@ -129,19 +129,26 @@ The nested-file search used for `AGENTS.md`, `CLAUDE.md` and similar never enter
 
 ## Windows and line endings
 
-Lockward pins the exact bytes an agent reads. With Git's `core.autocrlf=true` (the default on Windows), text files are checked out with CRLF line endings, so a Windows checkout really does contain different bytes from the LF files that were locked on Linux or macOS, and `verify` reports them as modified. Keep agent files LF on every OS with `.gitattributes`:
+Lockward pins the exact bytes an agent reads. With Git's `core.autocrlf=true` (the default on Windows), text files are checked out with CRLF line endings, so a Windows checkout really does contain different bytes from the LF files that were locked on Linux or macOS, and `verify` reports them as modified. Keep agent files LF on every OS with `.gitattributes`. `lockward init` creates it when the file is missing, or prints these lines to append to an existing one:
 
 ```gitattributes
-CLAUDE.md text eol=lf
-AGENTS.md text eol=lf
-.claude/** text eol=lf
-.cursor/** text eol=lf
-.github/copilot-instructions.md text eol=lf
-.github/instructions/** text eol=lf
-lockward.lock text eol=lf
-lockward.policy.yaml text eol=lf
-.lockwardignore text eol=lf
+CLAUDE.md text=auto eol=lf
+AGENTS.md text=auto eol=lf
+GEMINI.md text=auto eol=lf
+.mcp.json text=auto eol=lf
+.claude/** text=auto eol=lf
+.cursor/** text=auto eol=lf
+.codex/** text=auto eol=lf
+.gemini/** text=auto eol=lf
+.agents/** text=auto eol=lf
+.github/copilot-instructions.md text=auto eol=lf
+.github/instructions/** text=auto eol=lf
+lockward.lock text=auto eol=lf
+lockward.policy.yaml text=auto eol=lf
+.lockwardignore text=auto eol=lf
 ```
+
+Use `text=auto`, not `text`: with plain `text`, Git would also rewrite line endings inside binary files in skills (images, bytecode) and corrupt them.
 
 After adding it, run `git add --renormalize .` once and commit.
 
