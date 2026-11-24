@@ -113,7 +113,7 @@ jobs:
           persist-credentials: false
       - name: Run Breaktroughf1/lockward-action as a Marketplace user would
         id: lockward
-        uses: Breaktroughf1/lockward-action@126b1debbad46a5ccf2b249f540b1b4993eab153 # v0.2.0
+        uses: Breaktroughf1/lockward-action@bfbb98e7ac97a8ebe8361dab2d36dd4523ca1c1b # v0.2.0
         with:
           version: ${{ inputs.version || '0.2.0' }}
           args: verify --frozen --scope project
