@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- npm (`npx lockward`) and PyPI (`uvx lockward`) packages, starting at 0.2.2. They download the release archive for the platform, check its SHA-256 against the Sigstore-verified checksums and cache the binary. The container image `ghcr.io/breaktroughf1/lockward` is published for each release.
+
 ## [0.2.2] - 2026-11-24
 
 ### Fixed
@@ -77,6 +82,7 @@ First public release.
 - GitHub Action that verifies the release's Sigstore signature and checksum before running.
 - Reproducible release builds for Linux, macOS and Windows on amd64 and arm64, with a cosign-signed `checksums.txt` and SLSA build provenance.
 
+[Unreleased]: https://github.com/Breaktroughf1/lockward/compare/v0.2.2...HEAD
 [0.2.2]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.2
 [0.2.1]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.0

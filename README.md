@@ -99,6 +99,7 @@ Exit codes: `0` clean, `1` drift, `2` policy violation, `3` usage or configurati
 ## Install
 
 - **Homebrew** (macOS and Linux): `brew install breaktroughf1/tap/lockward`. With Homebrew 6 or later this trusts only the `lockward` formula, not the whole tap. The [tap](https://github.com/Breaktroughf1/homebrew-tap) regenerates its formula from each release's Sigstore-verified checksums and installs it on macOS and Linux before publishing.
+- **npm:** `npx lockward verify`, or `npm install -g lockward`. **PyPI:** `uvx lockward verify`, `pipx run lockward verify` or `pip install lockward`. Both are thin launchers: at first run they download the release archive for your platform and check its SHA-256 (taken from the Sigstore-verified `checksums.txt` when the package was built) before extracting, then cache the binary and re-check it on every run. They have no install scripts. Versions from 0.2.3 on are published from CI with npm provenance and PyPI attestations.
 - **Go:** `go install github.com/Breaktroughf1/lockward/cmd/lockward@latest` (Go 1.27 or later).
 - **Container** (GHCR, multi-arch, distroless, non-root, signed): mount the repository at `/src`.
 
