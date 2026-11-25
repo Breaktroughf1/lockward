@@ -8,6 +8,8 @@ Lockward pins every skill, MCP server, hook, rules file and security-relevant se
 
 > Scanners tell you what looks bad today. Lockward tells you what changed since you approved it, and blocks it.
 
+![Lockward pins a skill and an MCP server, a routine-looking update adds a credential-stealing instruction and drops a version pin, verify fails with exit code 1, and diff shows the added line](demo/lockward.gif)
+
 ## Why
 
 AI agents load third-party skills, MCP servers, hooks and instruction files that run with your shell, files and credentials. In 2026 that layer became an actively attacked supply chain: over a thousand malicious skills in one marketplace, MCP packages that turned malicious after 15 clean versions, repositories whose config auto-executes when opened, and public demonstrations that every major skill scanner can be bypassed.

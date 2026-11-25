@@ -12,7 +12,7 @@ Require lockward
 Require git
 
 Set Shell bash
-Set FontSize 18
+Set FontSize 16
 Set Width 1200
 Set Height 720
 Set Padding 24
