@@ -117,7 +117,16 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
       - run: npm install -g npm@11.21.2
-      - run: npm publish out/npm/lockward-*.tgz --access public
+      - name: Publish (skipped when this version is already on npm)
+        shell: bash
+        run: |
+          tgz=$(ls out/npm/lockward-*.tgz)
+          version=${tgz##*/lockward-}; version=${version%.tgz}
+          if npm view "lockward@${version}" version >/dev/null 2>&1; then
+            echo "::notice::lockward@${version} is already on npm; nothing to publish"
+            exit 0
+          fi
+          npm publish "$tgz" --access public
 
   publish-pypi:
     needs: [build, test]
