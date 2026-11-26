@@ -46,12 +46,14 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.13"
+      - name: npm is new enough for trusted publishing (11.5.1 or later)
+        run: node -e 'const [a,b,c]=require("child_process").execSync("npm --version").toString().trim().split(".").map(Number); console.log("npm", a+"."+b+"."+c); if (a<11||(a===11&&(b<5||(b===5&&c<1)))) process.exit(1)'
       - name: Build
         run: |
           mkdir -p packaging/out/npm packaging/out/pypi
           (cd packaging/npm && npm pack --pack-destination ../out/npm)
-          python -m pip install build==1.6.1
-          python -m build packaging/pypi --outdir packaging/out/pypi
+          python -m pip install --require-hashes --no-deps -r packaging/pypi/build-requirements.txt
+          python -m build --no-isolation packaging/pypi --outdir packaging/out/pypi
           ls -l packaging/out/npm packaging/out/pypi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -83,8 +85,8 @@ jobs:
         env:
           VERSION: ${{ needs.build.outputs.version }}
         run: |
-          npm install --prefix t out/npm/lockward-*.tgz
-          out="$(node t/node_modules/lockward/bin/lockward.js version)"
+          mkdir t && tar -xzf out/npm/lockward-*.tgz -C t
+          out="$(node t/package/bin/lockward.js version)"
           echo "$out"; test "$out" = "lockward ${VERSION}"
       - name: PyPI package runs the verified binary
         shell: bash
@@ -116,7 +118,8 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-      - run: npm install -g npm@11.21.2
+      - name: npm is new enough for trusted publishing (11.5.1 or later)
+        run: node -e 'const [a,b,c]=require("child_process").execSync("npm --version").toString().trim().split(".").map(Number); console.log("npm", a+"."+b+"."+c); if (a<11||(a===11&&(b<5||(b===5&&c<1)))) process.exit(1)'
       - name: Publish (skipped when this version is already on npm)
         shell: bash
         run: |
