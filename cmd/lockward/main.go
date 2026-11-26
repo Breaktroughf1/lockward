@@ -42,6 +42,8 @@ func runContext(ctx context.Context, args []string, stdout, stderr io.Writer) in
 		return int(exitcode.Clean)
 	case "help":
 		return runHelp(rest, stdout, stderr)
+	case "-version", "--version": // what most people type first
+		name = "version"
 	}
 	cmd, ok := lookup(name)
 	if !ok {
