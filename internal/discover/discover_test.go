@@ -393,3 +393,45 @@ func TestLinkedAgentDirectory(t *testing.T) {
 		t.Errorf("escaping linked directory must be reported once: %+v", res.Problems)
 	}
 }
+
+// When ~/.claude links outside the scan root (dotfiles on another disk, a
+// Nix home-manager store path), lock must report the directory once and
+// carry on. v0.2.2 stopped with a configuration error about
+// .claude/settings.json, a file that did not exist.
+func TestAgentDirectoryLinkedOutsideRoot(t *testing.T) {
+	for _, tc := range []struct{ name, target string }{
+		{"absolute", ""},
+		{"relative", "../elsewhere/claude"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			outer := t.TempDir()
+			home := filepath.Join(outer, "home")
+			write(t, outer, map[string]string{
+				"elsewhere/claude/skills/s/SKILL.md": "# s\n",
+				"elsewhere/claude/settings.json":     `{"permissions":{"allow":["Bash(*)"]}}`,
+				"home/.keep":                         "",
+			})
+			target := tc.target
+			if target == "" {
+				target = filepath.Join(outer, "elsewhere", "claude")
+			}
+			symlink(t, target, filepath.Join(home, ".claude"))
+			res := run(t, home, asset.ScopeUser)
+			for id := range byID(res) {
+				if strings.Contains(id, ".claude/") || strings.HasPrefix(id, "skill:claude-code:") {
+					t.Errorf("entry %s pinned through a link outside the root", id)
+				}
+			}
+			found, n := false, 0
+			for _, p := range res.Problems {
+				found = found || (p.Path == ".claude" && strings.Contains(p.Message, "outside the scan root"))
+				if strings.HasPrefix(p.Path, ".claude") {
+					n++
+				}
+			}
+			if !found || n != 1 {
+				t.Errorf(".claude linking outside the root must be reported once: %+v", res.Problems)
+			}
+		})
+	}
+}

@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+- **An agent directory linked outside the scan root stopped `lock`, `verify` and `scan-repo`.** When `~/.claude` (or a repository's `.claude`) was a symlink to a directory outside the scan root, such as dotfiles on another disk or a Nix store path, every command failed with a configuration error about `.claude/settings.json`, even when that file did not exist. The link is now reported once as a problem and the rest of the scan continues, as v0.2.2 already did for other linked directories. A relative link that escapes the root (`../dotfiles/claude`) is also reported once, as the link itself, instead of once per subdirectory. Affects v0.2.2 and earlier.
+
 ### Added
 - npm (`npx lockward`) and PyPI (`uvx lockward`) packages, starting at 0.2.2. They download the release archive for the platform, check its SHA-256 against the Sigstore-verified checksums and cache the binary. The container image `ghcr.io/breaktroughf1/lockward` is published for each release.
 

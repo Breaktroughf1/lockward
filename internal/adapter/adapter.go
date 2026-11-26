@@ -267,6 +267,7 @@ func (s *Source) Real(p string) (resolved string, k Kind, escaped bool) {
 	rest := splitPath(p)
 	done := ""
 	hops := 0
+	link := "" // the last symlink followed, reported when a relative target escapes
 	for len(rest) > 0 {
 		c := rest[0]
 		rest = rest[1:]
@@ -275,6 +276,9 @@ func (s *Source) Real(p string) (resolved string, k Kind, escaped bool) {
 			continue
 		case "..":
 			if done == "" {
+				if link != "" {
+					return link, Symlink, true
+				}
 				return p, Symlink, true
 			}
 			done = parentDir(done)
@@ -290,6 +294,7 @@ func (s *Source) Real(p string) (resolved string, k Kind, escaped bool) {
 			if err != nil {
 				return next, Symlink, true
 			}
+			link = next
 			if filepath.IsAbs(target) || strings.HasPrefix(target, "/") {
 				rel, ok := s.linkTarget(target)
 				if !ok {
@@ -367,9 +372,15 @@ func (s *Source) linkTarget(target string) (string, bool) {
 const MaxConfigSize = 16 << 20
 
 // ReadConfig reads a config file for parsing. ok is false when the file does
-// not exist. A file that exists but cannot be read safely (escaping symlink,
-// too large, not a regular file) yields ok=true, b=nil and a problem message.
+// not exist, or when a parent directory links outside the root (that link is
+// recorded for EscapedDirs, as in Stat). A file that exists but cannot be read
+// safely (the file itself is an escaping symlink, too large, not a regular
+// file) yields ok=true, b=nil and a problem message.
 func (s *Source) ReadConfig(p string) (b []byte, ok bool, problem string) {
+	if _, escapedDir := s.locate(p); escapedDir != "" {
+		s.noteEscaped(escapedDir)
+		return nil, false, ""
+	}
 	resolved, k, escaped := s.Real(p)
 	switch {
 	case k == Missing:
