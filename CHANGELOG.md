@@ -2,10 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.2.3] - 2026-11-26
 
 ### Fixed
 - **An agent directory linked outside the scan root stopped `lock`, `verify` and `scan-repo`.** When `~/.claude` (or a repository's `.claude`) was a symlink to a directory outside the scan root, such as dotfiles on another disk or a Nix store path, every command failed with a configuration error about `.claude/settings.json`, even when that file did not exist. The link is now reported once as a problem and the rest of the scan continues, as v0.2.2 already did for other linked directories. A relative link that escapes the root (`../dotfiles/claude`) is also reported once, as the link itself, instead of once per subdirectory. Affects v0.2.2 and earlier.
+
+### Changed
+- The GitHub Action installs 0.2.3 by default.
 
 ### Added
 - `lockward --version` (and `-version`) print the version, the same as `lockward version`.
@@ -86,7 +89,7 @@ First public release.
 - GitHub Action that verifies the release's Sigstore signature and checksum before running.
 - Reproducible release builds for Linux, macOS and Windows on amd64 and arm64, with a cosign-signed `checksums.txt` and SLSA build provenance.
 
-[Unreleased]: https://github.com/Breaktroughf1/lockward/compare/v0.2.2...HEAD
+[0.2.3]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.3
 [0.2.2]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.2
 [0.2.1]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Breaktroughf1/lockward/releases/tag/v0.2.0
