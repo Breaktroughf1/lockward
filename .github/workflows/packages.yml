@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Release tag to package, e.g. v0.2.2
+        description: Release tag to package, e.g. v0.2.3
         required: true
       publish:
         description: Publish to npm and PyPI after the tests pass
